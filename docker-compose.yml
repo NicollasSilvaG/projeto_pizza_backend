@@ -1,0 +1,12 @@
+services:
+  postgres:
+    image: postgres:latest
+    container_name: dompizzas_postgres
+    environment:
+      POSTGRES_USER: dompizzas
+      POSTGRES_PASSWORD: 201202
+      POSTGRES_DB: dompizzas
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./data:/data/postgres
