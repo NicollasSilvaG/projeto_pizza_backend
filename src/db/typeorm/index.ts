@@ -1,5 +1,6 @@
 import { DataSource } from "typeorm";
-import {CriarCliente1727391488329} from "./1727391488329-CriarCliente";
+import { CriarUsuarios1730775960413 } from "./migrations/1730775960413-CriarUsuarios";
+import { Usuario } from "../../entities/Usuario";
 
 
 export const dataSource = new DataSource({
@@ -9,6 +10,6 @@ export const dataSource = new DataSource({
     username: "dompizzas",
     password: "201202",
     database: "dompizzas",
-    entities: [],
-    migrations: [CriarCliente1727391488329]
+    entities: [Usuario],
+    migrations: [CriarUsuarios1730775960413]
 })

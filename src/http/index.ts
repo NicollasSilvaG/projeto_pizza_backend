@@ -1,6 +1,7 @@
 import express, {json, NextFunction, Request, Response} from "express";
 import {dataSource} from "../db/typeorm";
-import { Cupom } from "../entities/Cupom";
+import { Usuario } from "../entities/Usuario";
+import { UsuarioController } from "../controllers/UsuarioController";
 
 const app = express()
 app.use(json());
@@ -20,11 +21,11 @@ app.get('/erro', (req: Request, res: Response, next: NextFunction) => {
     }
 });
 
-app.get('/cupons', async (req: Request, res: Response) => {
+app.get('/usuarios', async (req: Request, res: Response) => {
     try {
-        const cupom = dataSource.getRepository(Cupom);
-        const cupons = await cupom.find(); // Busca todos os cupons
-        res.json(cupons);
+        const usuario = dataSource.getRepository(Usuario);
+        const usuarios = await usuario.find(); // Busca todos os usuarios
+        res.json(usuarios);
     } catch (error) {
         res.status(500).json({ message: 'Erro ao buscar cupons', error });
     }

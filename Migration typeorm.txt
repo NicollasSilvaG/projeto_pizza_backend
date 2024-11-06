@@ -19,7 +19,7 @@ Criar Migration:
 npm run typeorm migration:create src/shared/typeorm/migrations/CreateNomeTabela
 
 Rodar Migration: 
-npm run typeorm -- -d ./src/shared/typeorm/index.ts migration:run
+npm run typeorm -- -d ./src/db/typeorm/index.ts migration:run 
 
 Reverter Migration
-npm run typeorm -- -d ./src/shared/typeorm/index.ts migration:run
+npm run typeorm -- -d ./src/db/typeorm/index.ts migration:revert
