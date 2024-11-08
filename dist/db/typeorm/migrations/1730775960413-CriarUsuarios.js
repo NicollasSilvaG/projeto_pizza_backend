@@ -1,7 +1,6 @@
-import { MigrationInterface, QueryRunner, Table, TableCheck } from "typeorm";
-
-export class CriarUsuarios1730775960413 implements MigrationInterface {
-    public async up(queryRunner: QueryRunner): Promise<void> {
+import { Table, TableCheck } from "typeorm";
+export class CriarUsuarios1730775960413 {
+    async up(queryRunner) {
         await queryRunner.createTable(new Table({
             name: "usuario",
             columns: [
@@ -67,14 +66,12 @@ export class CriarUsuarios1730775960413 implements MigrationInterface {
                 },
             ],
         }));
-
         await queryRunner.createCheckConstraint("usuario", new TableCheck({
             name: "CHK_usuario_permissao",
             expression: "permissao IN ('admin', 'cliente')"
         }));
     }
-
-    public async down(queryRunner: QueryRunner): Promise<void> {
+    async down(queryRunner) {
         await queryRunner.dropTable("usuario");
     }
 }

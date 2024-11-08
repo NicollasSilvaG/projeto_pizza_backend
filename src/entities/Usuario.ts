@@ -5,33 +5,36 @@ export class Usuario {
     @PrimaryGeneratedColumn()
     idUsuario: number;
 
-    @Column({ type: "varchar" })
+    @Column({ length: 45 })
     nome: string;
 
-    @Column({ type: "varchar", unique: true })
+    @Column({ length: 45 })
     email: string;
 
-    @Column({ type: "varchar", length: 11, nullable: true })
+    @Column({ length: 45 })
     telefone: string;
 
-    @Column({ type: "varchar", length: 45, nullable: true })
+    @Column({ length: 45 })
     rua: string;
 
-    @Column({ type: "varchar", length: 45, nullable: true })
+    @Column({ length: 45 })
     cidade: string;
 
-    @Column({ type: "varchar", length: 2, nullable: true })
+    @Column({ length: 2 })
     uf: string;
 
-    @Column({ type: "varchar", length: 45, nullable: true })
+    @Column({ length: 45 })
     cep: string;
 
-    @Column({ type: "varchar", length: 45, nullable: true })
+    @Column({ length: 45 })
     bairro: string;
 
-    @Column({ type: "varchar", length: 45, nullable: true })
+    @Column({ length: 45 })
     complemento: string;
 
-    @Column({ type: "varchar", length: 10, default: "cliente" })
+    @Column({ length: 10 })
     permissao: string;
+
+    @Column({ length: 45 })
+    senha: string;
 }
