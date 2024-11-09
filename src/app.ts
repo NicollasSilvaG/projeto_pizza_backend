@@ -23,6 +23,9 @@ app.use(express.json());
 // Usar o roteador principal
 app.use('/autenticacao', router);
 
+app.use('/flutter', router);
+
+
 app.listen(3070, () => {
   console.log('Servidor rodando na porta 3070');
 });

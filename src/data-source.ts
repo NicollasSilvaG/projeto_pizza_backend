@@ -1,6 +1,6 @@
 import { DataSource } from "typeorm";
-import { Autenticacao1731022435641 } from "./db/typeorm/migrations/1731022435641-autenticacao";
-import { Autenticacao } from "./entities/Autenticacao";
+import { Usuario } from "./entities/Usuario";
+import { Usuario1731162498445 } from "./db/typeorm/migrations/1731162498445-usuario";
 
 export const AppDataSource = new DataSource({
     type: "postgres",
@@ -9,8 +9,8 @@ export const AppDataSource = new DataSource({
   username: "dompizzas",
   password: "201202",
   database: "dompizzas",
-    entities: [Autenticacao],
-    migrations: [ Autenticacao1731022435641],
+    entities: [Usuario],
+    migrations: [ Usuario1731162498445],
     synchronize: true,
 
 });

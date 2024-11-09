@@ -5,11 +5,17 @@ export class Usuario {
     @PrimaryGeneratedColumn()
     idUsuario: number;
 
-    @Column({ length: 45 })
+    @Column({ length: 45, nullable: false })
     nome: string;
 
-    @Column({ length: 45 })
+    @Column({ length: 80, unique: true, nullable: false })
     email: string;
+
+    @Column({ length: 255, nullable: false  })
+    senha: string;
+
+    @Column({ length: 15, default: "cliente", nullable: false  })
+    permissao: string;
 
     @Column({ length: 45 })
     telefone: string;
@@ -31,10 +37,4 @@ export class Usuario {
 
     @Column({ length: 45 })
     complemento: string;
-
-    @Column({ length: 10 })
-    permissao: string;
-
-    @Column({ length: 45 })
-    senha: string;
 }
