@@ -6,8 +6,7 @@ import router from './http/routes/authRoutes';  // Supondo que seu arquivo de ro
 
 const app = express();
 
-// Usando o middleware CORS
-app.use(cors());  // Permite todas as origens por padrão
+app.use(cors());  
 
 // Iniciar a conexão com o banco de dados
 AppDataSource.initialize()

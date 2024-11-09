@@ -16,4 +16,13 @@ router.post('/cadastrar', async (req, res) => {
   }
 });
 
+// Rota para login de usuário com async/await
+router.post('/login', async (req, res) => {
+  try {
+    await authController.login(req, res);  // Corrigido para chamar o método de login
+  } catch (error) {
+    res.status(500).json({ error: 'Erro no processamento da requisição' });
+  }
+});
+
 export default router;
