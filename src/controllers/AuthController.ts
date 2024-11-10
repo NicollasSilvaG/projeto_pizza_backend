@@ -4,7 +4,6 @@ import jwt from 'jsonwebtoken';
 import { Autenticacao } from '../entities/Autenticacao';
 import { AppDataSource } from '../data-source';
 
-// Defina uma chave secreta segura em uma variável de ambiente
 const JWT_SECRET = process.env.JWT_SECRET || 'seu-segredo-jwt-aqui';
 
 export class AuthController {

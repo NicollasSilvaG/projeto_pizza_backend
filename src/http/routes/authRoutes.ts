@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import cors from 'cors';  // Importando o CORS
 import { AuthController } from '../../controllers/AuthController';
-import { cadastrarUsuario } from '../../controllers/UsuarioController'; // Verifique o caminho
+import { cadastrarUsuario, loginUsuario } from '../../controllers/UsuarioController'; // Verifique o caminho
 
 const router = Router();
 const authController = new AuthController();
@@ -32,7 +32,17 @@ router.post('/cadastro', async (req, res) => {
 
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'Erro no processamento da requisição para Flutter', details: error});
+    res.status(500).json({ error: 'Erro no processamento da requisição', details: error});
+  }
+});
+
+router.post('/loginuser', async (req, res) => {
+  try {
+    await loginUsuario(req, res);  // Usando a função cadastrarUsuario diretamente
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Erro no processamento da requisição', details: error});
   }
 });
 

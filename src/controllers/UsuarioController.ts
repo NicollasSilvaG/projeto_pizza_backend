@@ -1,7 +1,10 @@
 import { Request, Response } from "express";
 import { AppDataSource } from "../data-source";  // Importe o DataSource
 import { Usuario } from "../entities/Usuario";   // Importe a entidade Usuario
-import bcrypt from "bcrypt";  // Adicionando o bcrypt para segurança da senha
+import bcrypt from "bcrypt"; 
+import jwt from 'jsonwebtoken';
+
+const SECRET_KEY = "seu_secret_key"; // Use uma chave secreta segura para o JWT
 
 export const cadastrarUsuario = async (req: Request, res: Response) => {
     const { nome, email, senha, telefone, rua, cidade, uf, cep, bairro, complemento } = req.body;
@@ -47,3 +50,33 @@ export const cadastrarUsuario = async (req: Request, res: Response) => {
         return res.status(500).json({ error: "Erro ao cadastrar o usuário", details: error});
     }
 };
+export const loginUsuario = async (req: Request, res: Response) => {
+    const { email, senha } = req.body;
+
+    if (!email || !senha) {
+        return res.status(400).json({ error: "Email e senha são obrigatórios." });
+    }
+
+    const usuarioRepository = AppDataSource.getRepository(Usuario);
+
+    try {
+        const usuario = await usuarioRepository.findOne({ where: { email } });
+        if (!usuario) {
+            return res.status(400).json({ error: "Usuário não encontrado." });
+        }
+
+        const isPasswordValid = await bcrypt.compare(senha, usuario.senha);
+        if (!isPasswordValid) {
+            return res.status(400).json({ error: "Senha incorreta." });
+        }
+
+        // Gerar o token JWT
+        const token = jwt.sign({ id: usuario.idUsuario, email: usuario.email }, SECRET_KEY, { expiresIn: "1h" });
+
+        return res.status(200).json({ message: "Login realizado com sucesso", token });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ error: "Erro ao realizar o login", details: error });
+    }
+};
+
