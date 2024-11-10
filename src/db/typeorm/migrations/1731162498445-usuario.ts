@@ -27,6 +27,12 @@ export class Usuario1731162498445 implements MigrationInterface {
                         isNullable: false, // Campo não pode ser nulo
                     },
                     {
+                        name: "telefone",
+                        type: "varchar",
+                        length: "15", // Ajustado para o tamanho do telefone
+                        isNullable: false, // Permitindo nulo
+                    },
+                    {
                         name: "senha",
                         type: "varchar",
                         length: "255", // Aumentado para suportar senhas criptografadas
@@ -38,12 +44,6 @@ export class Usuario1731162498445 implements MigrationInterface {
                         length: "15", // Ajustado para o tamanho do campo de permissao
                         default: "'cliente'", // Valor padrão
                         isNullable: false, // Campo não pode ser nulo
-                    },
-                    {
-                        name: "telefone",
-                        type: "varchar",
-                        length: "15", // Ajustado para o tamanho do telefone
-                        isNullable: true, // Permitindo nulo
                     },
                     {
                         name: "rua",
