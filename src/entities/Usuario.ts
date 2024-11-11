@@ -11,7 +11,7 @@ export class Usuario {
     @Column({ length: 80, unique: true, nullable: false })
     email: string;
 
-    @Column({ length: 45 })
+    @Column({ length: 45,  nullable: false  })
     telefone: string;
 
     @Column({ length: 255, nullable: false  })

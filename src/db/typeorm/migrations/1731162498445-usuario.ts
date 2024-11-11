@@ -49,37 +49,37 @@ export class Usuario1731162498445 implements MigrationInterface {
                         name: "rua",
                         type: "varchar",
                         length: "45",
-                        isNullable: true, // Permitindo nulo
+                        isNullable: false, // Permitindo nulo
                     },
                     {
                         name: "cidade",
                         type: "varchar",
                         length: "45",
-                        isNullable: true, // Permitindo nulo
+                        isNullable: false, // Permitindo nulo
                     },
                     {
                         name: "uf",
                         type: "varchar",
                         length: "2",
-                        isNullable: true, // Permitindo nulo
+                        isNullable: false, // Permitindo nulo
                     },
                     {
                         name: "cep",
                         type: "varchar",
                         length: "45",
-                        isNullable: true, // Permitindo nulo
+                        isNullable: false, // Permitindo nulo
                     },
                     {
                         name: "bairro",
                         type: "varchar",
                         length: "45",
-                        isNullable: true, // Permitindo nulo
+                        isNullable: false, // Permitindo nulo
                     },
                     {
                         name: "complemento",
                         type: "varchar",
                         length: "45",
-                        isNullable: true, // Permitindo nulo
+                        isNullable: false, // Permitindo nulo
                     },
                 ],
             })
