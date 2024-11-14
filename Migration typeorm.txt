@@ -16,7 +16,7 @@ Dependências dev(-D): typescript, ts-node-dev ou ts-node
 3) Comandos
 
 Criar Migration:
-npm run typeorm migration:create src/shared/typeorm/migrations/CreateNomeTabela
+npm run typeorm migration:create src/db/typeorm/migrations/CreateNomeTabela
 
 Rodar Migration: 
 npm run typeorm -- -d ./src/db/typeorm/index.ts migration:run 

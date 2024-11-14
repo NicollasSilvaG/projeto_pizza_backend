@@ -22,7 +22,7 @@ app.use(express.json());
 
 // Usar o roteador principal
 app.use('/autenticacao', router);
-
+  
 app.use('/flutter', router);
 
 

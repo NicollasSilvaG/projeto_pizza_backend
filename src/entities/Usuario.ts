@@ -1,4 +1,5 @@
-import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from "typeorm";
+import { Pedido } from "./Pedido";
 
 @Entity("usuario")
 export class Usuario {
@@ -37,4 +38,7 @@ export class Usuario {
 
     @Column({ length: 45 })
     complemento: string;
+
+    @OneToMany(() => Pedido, (pedido) => pedido.usuario)
+    pedidos: Pedido[];
 }
