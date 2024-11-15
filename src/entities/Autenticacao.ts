@@ -8,7 +8,7 @@ export class Autenticacao {
     @Column({ length: 45 })
     login: string;
 
-    @Column({ length: 70 })
+    @Column({ length: 200 })
     senha: string;
 
     @Column({ length: 45 })

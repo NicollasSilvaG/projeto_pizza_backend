@@ -8,7 +8,7 @@ export class Autenticacao1731022435641 implements MigrationInterface {
                 columns: [
                     { name: "idAutenticacao", type: "int", isPrimary: true, isGenerated: true, generationStrategy: "increment" },
                     { name: "login", type: "varchar", length: "45" },
-                    { name: "senha", type: "varchar", length: "45" },
+                    { name: "senha", type: "varchar", length: "200" },
                     { name: "nome", type: "varchar", length: "45" },
                 ],
             })

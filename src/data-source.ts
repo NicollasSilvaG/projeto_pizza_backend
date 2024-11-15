@@ -13,6 +13,8 @@ import { Produto1731371833892 } from "./db/typeorm/migrations/1731371833892-prod
 import { Produto } from "./entities/Produto";
 import { Categoria } from "./entities/Categoria";
 import { Categoria1731371807369 } from "./db/typeorm/migrations/1731371807369-categoria";
+import { Autenticacao } from "./entities/Autenticacao";
+import { Autenticacao1731022435641 } from "./db/typeorm/migrations/1731022435641-autenticacao";
 
 export const AppDataSource = new DataSource({
     type: "postgres",
@@ -21,7 +23,7 @@ export const AppDataSource = new DataSource({
     username: "dompizzas",
     password: "201202",
     database: "dompizzas",
-    entities: [Pedido, PedidoProduto, Cupom, Entrega, Usuario, Produto, Categoria],  // Inclui todas as entidades
+    entities: [Pedido, PedidoProduto, Cupom, Entrega, Usuario, Produto, Categoria, Autenticacao],  // Inclui todas as entidades
     migrations: [
         Categoria1731371807369,
         Produto1731371833892,
@@ -35,7 +37,8 @@ export const AppDataSource = new DataSource({
         Pedido1731532000000,
 
         // Finalmente criamos a tabela de junção PedidoProduto que depende de Pedido e Produto
-        PedidoProduto1731532121974, // Depois as migrações restantes
+        PedidoProduto1731532121974, 
+        Autenticacao1731022435641// Depois as migrações restantes
     ],
     synchronize: false,  // Deixe como false em produção para não criar tabelas automaticamente
 });
