@@ -4,7 +4,7 @@ import { Pedido } from './Pedido';
 
 @Entity('pedido_e_produto')
 export class PedidoProduto {
-    @PrimaryGeneratedColumn() // Adicionando a coluna primária
+    @PrimaryGeneratedColumn()
     idPedidoProduto: number;
 
     @ManyToOne(() => Pedido)

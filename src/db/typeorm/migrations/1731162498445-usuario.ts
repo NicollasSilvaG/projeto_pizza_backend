@@ -30,7 +30,7 @@ export class Usuario1731162498445 implements MigrationInterface {
                         name: "telefone",
                         type: "varchar",
                         length: "45", // Ajustado para o tamanho do telefone
-                        isNullable: false, 
+                        isNullable: true, 
                     },
                     {
                         name: "senha",

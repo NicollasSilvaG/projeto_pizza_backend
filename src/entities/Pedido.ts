@@ -1,9 +1,9 @@
-// src/entity/Pedido.ts
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, ManyToMany, JoinTable } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, OneToMany } from 'typeorm';
 import { Usuario } from "./Usuario";
 import { Cupom } from './Cupom';
 import { Entrega } from './Entrega';
 import { Produto } from './Produto';
+import { PedidoProduto } from './PedidoProduto'; // Importando a entidade PedidoProduto
 
 export enum TipoPagamento {
     DINHEIRO = "dinheiro",
@@ -17,7 +17,7 @@ export class Pedido {
     @PrimaryGeneratedColumn()
     idPedido: number;
 
-    @Column({ type: 'varchar', length: 100, nullable: false })
+    @Column({ type: 'varchar', length: 100})
     status: string;
 
     @ManyToOne(() => Cupom, (cupom) => cupom.pedidos, { nullable: true })
@@ -30,8 +30,7 @@ export class Pedido {
 
     @Column({
         type: 'enum',
-        enum: TipoPagamento,
-        nullable: false
+        enum: TipoPagamento
     })
     tipo_pagamento: TipoPagamento;
 
@@ -39,12 +38,12 @@ export class Pedido {
     @JoinColumn({ name: "idUsuario" })
     usuario: Usuario;
 
-    // Relacionamento muitos-para-muitos com Produtos
-    @ManyToMany(() => Produto)
-    @JoinTable({
-        name: 'pedido_produto', // Nome da tabela de junção
-        joinColumn: { name: 'idPedido', referencedColumnName: 'idPedido' }, // Referência para Pedido
-        inverseJoinColumn: { name: 'idProduto', referencedColumnName: 'idProduto' } // Referência para Produto
-    })
-    produtos: Produto[];
+    // Relacionamento um-para-muitos com PedidoProduto (tabela de junção)
+    @OneToMany(() => PedidoProduto, (pedidoProduto) => pedidoProduto.pedido)
+    pedidoProdutos: PedidoProduto[];
+
+    // Caso precise acessar os produtos diretamente, pode usar a relação reversa
+    get produtos() {
+        return this.pedidoProdutos.map(pp => pp.produto);
+    }
 }

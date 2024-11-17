@@ -5,12 +5,11 @@ import { Pedido } from './Pedido'; // Importar a entidade Pedido
 
 @Entity('produto')
 export class Produto {
-    [x: string]: any;
-    @PrimaryGeneratedColumn()
+    @PrimaryGeneratedColumn({ name: 'idProduto' }) // Aqui você pode mapear explicitamente a coluna para `idProduto`
     idProduto: number;
 
     @Column({ type: 'varchar', length: 45 })
-    nome: string;
+    nome: string;   
 
     @Column({ type: 'int' })
     quantidade: number;
@@ -27,8 +26,4 @@ export class Produto {
     @ManyToOne(() => Categoria)
     @JoinColumn({ name: 'categoria_idCategoria' })
     categoria: Categoria;
-
-    @ManyToMany(() => Pedido, (pedido) => pedido.produtos)
-    pedidos: Pedido[];
-    produto: any;
 }

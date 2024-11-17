@@ -10,6 +10,8 @@ export class Pedido1731532000000 implements MigrationInterface {
                         name: 'idPedido',
                         type: 'serial',
                         isPrimary: true,
+                        isGenerated: true,
+                        generationStrategy: "increment"
                     },
                     {
                         name: 'status',

@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { Produto } from '../entities/Produto';
-import { AppDataSource } from '../data-source'; // Certifique-se de que o caminho esteja correto
+import { AppDataSource } from '../data-source'; 
 import { Categoria } from '../entities/Categoria';
 
 class ProdutoController {
@@ -12,7 +12,7 @@ class ProdutoController {
             const { nome, quantidade, preco, descricao, tamanho, categoria_idCategoria } = req.body;
             
             const produto = produtoRepository.create({
-                nome,
+                nome, 
                 quantidade,
                 preco,
                 descricao,

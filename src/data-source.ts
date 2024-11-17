@@ -40,7 +40,7 @@ export const AppDataSource = new DataSource({
         PedidoProduto1731532121974, 
         Autenticacao1731022435641// Depois as migrações restantes
     ],
-    synchronize: false,  // Deixe como false em produção para não criar tabelas automaticamente
+    synchronize: true,  // Deixe como false em produção para não criar tabelas automaticamente
 });
 
 AppDataSource.initialize()
