@@ -2,14 +2,44 @@ import { Request, Response } from 'express';
 import { Produto } from '../entities/Produto';
 import { AppDataSource } from '../data-source'; 
 import { Categoria } from '../entities/Categoria';
+import multer from 'multer';
+import path from 'path';
 
+const upload = multer({
+    storage: multer.diskStorage({
+      destination: (req, file, cb) => {
+        const dest = path.resolve(__dirname, '../../uploads'); // Caminho fora de src
+        console.log('Destination folder:', dest); // Para debug
+        cb(null, dest);
+      },
+      filename: (req, file, cb) => {
+        const uniqueName = `${Date.now()}-${file.originalname}`;
+        console.log('Generated filename:', uniqueName); // Para debug
+        cb(null, uniqueName);
+      },
+    }),
+  });
+  
 class ProdutoController {
 
     // Método para criar um novo produto
     public async create(req: Request, res: Response): Promise<Response> {
         try {
-            const produtoRepository = AppDataSource.getRepository(Produto); // Usando AppDataSource
+
+            const produtoRepository = AppDataSource.getRepository(Produto);
+            const categoriaRepository = AppDataSource.getRepository(Categoria);
             const { nome, quantidade, preco, descricao, tamanho, categoria_idCategoria } = req.body;
+            
+            const categoria = await categoriaRepository.findOne({
+                where: { idCategoria: categoria_idCategoria },
+            });
+
+            if (!categoria) {
+                return res.status(404).json({ message: "Categoria não encontrada." });
+            }
+
+            const imagemCaminho = req.file ? `http://localhost:3070/uploads/${req.file.filename}` : null;
+            console.log('Image path:', imagemCaminho);
             
             const produto = produtoRepository.create({
                 nome, 
@@ -17,7 +47,8 @@ class ProdutoController {
                 preco,
                 descricao,
                 tamanho,
-                categoria: { idCategoria: categoria_idCategoria } // Referência à categoria
+                categoria, 
+                imagem: imagemCaminho
             });
 
             await produtoRepository.save(produto);
@@ -66,40 +97,43 @@ class ProdutoController {
         try {
             const produtoRepository = AppDataSource.getRepository(Produto);
             const categoriaRepository = AppDataSource.getRepository(Categoria);
-    
-            // Encontre o produto pelo ID
+
+            // Buscar produto
             const produto = await produtoRepository.findOne({
                 where: { idProduto: Number(req.params.idProduto) },
-                relations: ["categoria"] // Inclui a categoria na consulta
+                relations: ["categoria"],
             });
-    
+
             if (!produto) {
                 return res.status(404).json({ message: "Produto não encontrado." });
             }
-    
-            // Atualizando as informações do produto
+
+            // Atualizar informações
             produto.nome = req.body.nome || produto.nome;
             produto.quantidade = req.body.quantidade || produto.quantidade;
             produto.preco = req.body.preco || produto.preco;
             produto.descricao = req.body.descricao || produto.descricao;
             produto.tamanho = req.body.tamanho || produto.tamanho;
-    
-            // Verifica se um novo idCategoria foi fornecido e busca a categoria completa
+
+            // Atualizar categoria, se fornecida
             if (req.body.categoria_idCategoria) {
                 const categoria = await categoriaRepository.findOne({
-                    where: { idCategoria: req.body.categoria_idCategoria }
+                    where: { idCategoria: req.body.categoria_idCategoria },
                 });
-    
-                if (categoria) {
-                    produto.categoria = categoria; // Atribui a categoria completa ao produto
-                } else {
+
+                if (!categoria) {
                     return res.status(404).json({ message: "Categoria não encontrada." });
                 }
+
+                produto.categoria = categoria;
             }
-    
-            // Salva as alterações no produto
+
+            // Atualizar imagem, se fornecida
+            if (req.file) {
+                produto.imagem = `uploads/${req.file.filename}`;
+            }
+
             await produtoRepository.save(produto);
-    
             return res.status(200).json(produto);
         } catch (error) {
             console.error(error);
@@ -107,7 +141,6 @@ class ProdutoController {
         }
     }
     
-    // Método para deletar um produto
     public async delete(req: Request, res: Response): Promise<Response> {
         try {
             const produtoRepository = AppDataSource.getRepository(Produto); // Usando AppDataSource

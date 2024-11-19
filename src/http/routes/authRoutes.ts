@@ -9,6 +9,7 @@ import PedidoProdutoController from '../../controllers/PedidoProdutoController';
 import { Pedido } from '../../entities/Pedido';
 import CupomController  from '../../controllers/CupomController';
 import EntregaController  from '../../controllers/EntregaController';
+import upload from '../../controllers/uploadService';
 
 
 const router = Router();
@@ -55,7 +56,7 @@ router.post('/loginuser', async (req, res) => {
 });
 
 // Rota para adicionar um produto
-router.post('/produto', async (req, res) => {
+router.post('/produto', upload.single('imagem'), async (req, res) => {
   try {
     await ProdutoController.create(req, res);  // Usando o ProdutoController para criar um produto
   } catch (error) {
