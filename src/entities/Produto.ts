@@ -22,6 +22,9 @@ export class Produto {
 
     @Column({ type: 'varchar', length: 45 })
     tamanho: string;
+    
+    @Column({ type: 'varchar', length: 255 })
+    imagem: string;
 
     @ManyToOne(() => Categoria)
     @JoinColumn({ name: 'categoria_idCategoria' })
