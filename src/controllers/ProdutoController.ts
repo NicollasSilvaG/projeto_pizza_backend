@@ -40,7 +40,7 @@ class ProdutoController {
 
             const imagemCaminho = req.file ? `http://localhost:3070/uploads/${req.file.filename}` : null;
             console.log('Image path:', imagemCaminho);
-            
+
             const produto = produtoRepository.create({
                 nome, 
                 quantidade,
@@ -64,12 +64,20 @@ class ProdutoController {
         try {
             const produtoRepository = AppDataSource.getRepository(Produto); // Usando AppDataSource
             const produtos = await produtoRepository.find({ relations: ["categoria"] }); // Incluindo relação com categoria
-            return res.status(200).json(produtos);
+    
+            // Adicionando o campo 'imagemUrl' com a URL da imagem para cada produto
+            const produtosComImagens = produtos.map(produto => ({
+                ...produto,
+                imagemUrl: produto.imagem,  // A URL completa já está no banco
+              }));
+            
+            return res.status(200).json(produtosComImagens); // Retorna os produtos com a URL da imagem
         } catch (error) {
             console.error(error);
             return res.status(500).json({ message: "Erro ao buscar produtos." });
         }
     }
+
 
     // Método para buscar um produto por ID
     public async findOne(req: Request, res: Response): Promise<Response> {
