@@ -9,6 +9,7 @@ import PedidoProdutoController from '../../controllers/PedidoProdutoController';
 import { Pedido } from '../../entities/Pedido';
 import CupomController  from '../../controllers/CupomController';
 import EntregaController  from '../../controllers/EntregaController';
+import CategoriaController from '../../controllers/CategoriaController';
 import upload from '../../controllers/uploadService';
 
 
@@ -166,6 +167,20 @@ router.put('/entrega/:idEntrega', EntregaController.atualizarEntrega);
 
 // Rota para deletar uma entrega
 router.delete('/entrega/:idEntrega', EntregaController.deletarEntrega);
+
+router.post('/categoria', CategoriaController.criarCategoria);
+
+// Rota para buscar todas as categorias
+router.get('/categorias', CategoriaController.buscarCategorias);
+
+// Rota para buscar uma categoria pelo ID
+router.get('/categoria/:idCategoria', CategoriaController.buscarCategoriaPorId);
+
+// Rota para atualizar uma categoria pelo ID
+router.put('/categoria/:idCategoria', CategoriaController.atualizarCategoria);
+
+// Rota para deletar uma categoria pelo ID
+router.delete('/categoria/:idCategoria', CategoriaController.deletarCategoria);
 
 export default router;
 

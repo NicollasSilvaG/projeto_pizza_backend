@@ -39,7 +39,6 @@ class ProdutoController {
             }
 
             const imagemCaminho = req.file ? `http://localhost:3070/uploads/${req.file.filename}` : null;
-            console.log('Image path:', imagemCaminho);
 
             const produto = produtoRepository.create({
                 nome, 
