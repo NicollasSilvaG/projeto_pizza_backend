@@ -7,25 +7,22 @@ const categoriaRepository = AppDataSource.getRepository(Categoria);
 const CategoriaController = {
   // Criar uma nova categoria
   criarCategoria: async (req: Request, res: Response): Promise<Response> => {
-    const { idCategoria, tipo } = req.body;
-
+    const { tipo } = req.body;
+  
     try {
-      // Verificar se já existe uma categoria com o mesmo id
+      // Verificar se já existe uma categoria com o mesmo tipo
       const categoriaExistente = await categoriaRepository.findOne({
-        where: { idCategoria },
+        where: { tipo },
       });
-
+  
       if (categoriaExistente) {
-        return res.status(400).json({ error: 'Já existe uma categoria com este ID.' });
+        return res.status(400).json({ error: 'Já existe uma categoria com este tipo.' });
       }
-
+  
       // Criar a nova categoria
-      const novaCategoria = categoriaRepository.create({ 
-        idCategoria, 
-        tipo 
-    });
+      const novaCategoria = categoriaRepository.create({ tipo });
       const categoriaSalva = await categoriaRepository.save(novaCategoria);
-
+  
       return res.status(201).json({
         message: 'Categoria criada com sucesso.',
         categoria: categoriaSalva,
