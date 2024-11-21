@@ -38,7 +38,7 @@ class ProdutoController {
                 return res.status(404).json({ message: "Categoria não encontrada." });
             }
 
-            const imagemCaminho = req.file ? `http://localhost:3070/uploads/${req.file.filename}` : null;
+            const imagemCaminho = req.file ? `uploads/${req.file.filename}` : null;
 
             const produto = produtoRepository.create({
                 nome, 
@@ -67,8 +67,9 @@ class ProdutoController {
             // Adicionando o campo 'imagemUrl' com a URL da imagem para cada produto
             const produtosComImagens = produtos.map(produto => ({
                 ...produto,
-                imagemUrl: produto.imagem,  // A URL completa já está no banco
-              }));
+                imagemUrl: produto.imagem ? `http://localhost:3070/${produto.imagem}` : null, // Constrói o URL completo
+            }));
+            
             
             return res.status(200).json(produtosComImagens); // Retorna os produtos com a URL da imagem
         } catch (error) {
@@ -85,7 +86,9 @@ class ProdutoController {
             const produto = await produtoRepository.findOne({
                 where: { idProduto: Number(req.params.idProduto) }, // Convertendo para número
                 relations: ["categoria"] // Incluindo a relação
+                
             });
+            
             
 
             if (!produto) {
