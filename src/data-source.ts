@@ -16,6 +16,9 @@ import { Categoria1731371807369 } from "./db/typeorm/migrations/1731371807369-ca
 import { Autenticacao } from "./entities/Autenticacao";
 import { Autenticacao1731022435641 } from "./db/typeorm/migrations/1731022435641-autenticacao";
 import { AddImagem1731977756462 } from "./db/typeorm/migrations/1731977756462-AddImagem";
+import { AlterColumnPorcentagem1732222752363 } from "./db/typeorm/migrations/1732222752363-AlterColumnPorcentagem";
+import { AddIdCupomToPedidoProduto1632229775486 } from "./db/typeorm/migrations/1732229775486-AddColumnPedProd";
+import { RemoveIdCupomFromPedido1648256730482 } from "./db/typeorm/migrations/1732232890326-RemoverIdCupom";//import { AddColumnPedProd1732229775486 } from "./db/typeorm/migrations/1732229775486-AddColumnPedProd";
 
 export const AppDataSource = new DataSource({
     type: "postgres",
@@ -40,7 +43,11 @@ export const AppDataSource = new DataSource({
         // Finalmente criamos a tabela de junção PedidoProduto que depende de Pedido e Produto
         PedidoProduto1731532121974, 
         Autenticacao1731022435641,
-        AddImagem1731977756462// Depois as migrações restantes
+        AddImagem1731977756462,
+        AlterColumnPorcentagem1732222752363,
+        AddIdCupomToPedidoProduto1632229775486,
+        //RemoveIdCupomFromPedido1648256730482
+
     ],
     synchronize: false,  // Deixe como false em produção para não criar tabelas automaticamente
 });

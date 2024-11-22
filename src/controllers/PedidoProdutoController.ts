@@ -1,30 +1,32 @@
 import { Request, Response } from 'express';
 import { AppDataSource } from '../data-source';
-import { PedidoProduto } from '../entities/PedidoProduto'; // A entidade de relacionamento
-import { Pedido } from '../entities/Pedido'; // Entidade do Pedido
-import { Produto } from '../entities/Produto'; // Entidade do Produto
-import { In } from 'typeorm'; // Para buscar múltiplos IDs
+import { PedidoProduto } from '../entities/PedidoProduto'; 
+import { Pedido } from '../entities/Pedido'; 
+import { Produto } from '../entities/Produto'; 
+import { In } from 'typeorm';
+import { Cupom } from '../entities/Cupom'; 
 
 const PedidoProdutoController = {
-
- adicionarProdutosAoPedido: async (pedido: Pedido, produtos: { idProduto: number; quantidade: number; precoUnitario: number; desconto: number; observacoes: string }[]): Promise<void> => {
+  adicionarProdutosAoPedido: async (pedido: Pedido, produtos: { idProduto: number; quantidade: number; precoUnitario: number; desconto: number; observacoes: string, idCupom: number}[]): Promise<number> => {
     try {
       const produtoRepository = AppDataSource.getRepository(Produto);
       const pedidoProdutoRepository = AppDataSource.getRepository(PedidoProduto);
+      const cupomRepository = AppDataSource.getRepository(Cupom);
 
       // Verificar se os produtos existem no banco
-      const produtosIds = produtos.map(p => p.idProduto); // Extrair apenas os IDs dos produtos
+      const produtosIds = produtos.map(p => p.idProduto);
       const produtosEncontrados = await produtoRepository.find({
         where: { idProduto: In(produtosIds) },
       });
 
       if (produtosEncontrados.length !== produtos.length) {
-        throw new Error('Alguns produtos não foram encontrados.');
+        throw new Error('Alguns produtos não foram encontrados no banco de dados.');
       }
 
+      let valorTotalPedido = 0;
+
       // Adicionar os produtos ao pedido
-      const pedidoProdutos = produtosEncontrados.map((produto) => {
-        // Encontrar os dados específicos do produto que foi enviado na requisição
+      const pedidoProdutos = produtosEncontrados.map(async (produto) => {
         const produtoData = produtos.find(p => p.idProduto === produto.idProduto);
 
         if (!produtoData) {
@@ -34,48 +36,50 @@ const PedidoProdutoController = {
         const pedidoProduto = new PedidoProduto();
         pedidoProduto.pedido = pedido;
         pedidoProduto.produto = produto;
-        pedidoProduto.quantidade = produtoData.quantidade || 1;   // Usando a quantidade fornecida
-        pedidoProduto.precoUnitario = produtoData.precoUnitario; // Usando o preço unitário fornecido
-        pedidoProduto.valorTotal = (produtoData.precoUnitario * produtoData.quantidade) - (produtoData.desconto || 0);  // Calculando o valor total
+        pedidoProduto.quantidade = produtoData.quantidade || 1;
+
+        // Subtrair o desconto diretamente no precoUnitario
+        pedidoProduto.precoUnitario = produtoData.precoUnitario - (produtoData.desconto || 0);
+
+        // Calcular o valor total do produto (com desconto aplicado)
+        let valorProduto = pedidoProduto.precoUnitario * produtoData.quantidade;
+
+        pedidoProduto.valorTotal = parseFloat(valorProduto.toFixed(2));
+
+        // Verificar e aplicar o desconto do cupom
+        if (produtoData.idCupom) {
+          const cupom = await cupomRepository.findOne({
+            where: { idCupom: produtoData.idCupom }
+          });
+
+          if (cupom && cupom.porcentagem_desconto) {
+            const porcentagemDesconto = parseFloat(cupom.porcentagem_desconto.toString());
+            const descontoCupom = (pedidoProduto.valorTotal * porcentagemDesconto) / 100;
+            pedidoProduto.valorTotal = parseFloat((pedidoProduto.valorTotal - descontoCupom).toFixed(2));
+            pedidoProduto.cupom = cupom;
+          } else {
+            throw new Error('Cupom inválido ou sem desconto aplicado.');
+          }
+        }
+
+        // Acumular o valor total do pedido
+        valorTotalPedido += pedidoProduto.valorTotal;
+
         pedidoProduto.desconto = produtoData.desconto || 0;
-        pedidoProduto.observacoes = produtoData.observacoes || ''; // Observações fornecidas
-        return pedidoProduto; 
+        pedidoProduto.observacoes = produtoData.observacoes || '';
+        return pedidoProduto;
       });
 
       // Salvar os registros na tabela de junção PedidoProduto
-      await pedidoProdutoRepository.save(pedidoProdutos);
+      await pedidoProdutoRepository.save(await Promise.all(pedidoProdutos));
+
+      // Retornar o valor total do pedido
+      return valorTotalPedido;
     } catch (error) {
       console.error('Erro ao adicionar produtos ao pedido:', error);
-      throw error; // Lança o erro para ser tratado no controller
+      throw new Error(`Erro ao adicionar produtos ao pedido`);
     }
-  },
-
-buscarTodosPedidosComProdutos: async (req: Request, res: Response): Promise<Response> => {
-  try {
-    const pedidoProdutoRepository = AppDataSource.getRepository(PedidoProduto);
-
-    // Buscar todos os pedidos com seus produtos relacionados
-    const pedidosComProdutos = await pedidoProdutoRepository
-    .createQueryBuilder('pedidoProduto')
-    .leftJoinAndSelect('pedidoProduto.pedido', 'pedido') // Join com Pedido
-    .leftJoinAndSelect('pedidoProduto.produto', 'produto') // Join com Produto
-    .orderBy('pedidoProduto.idPedidoProduto', 'ASC') // Ordenar por ID do PedidoProduto
-    .getMany();
-
-    if (!pedidosComProdutos || pedidosComProdutos.length === 0) {
-      return res.status(404).json({ error: 'Nenhum pedido encontrado com produtos.' });
-    }
-
-    return res.status(200).json(pedidosComProdutos);
-  } catch (error) {
-    console.error('Erro ao buscar pedidos com produtos:', error);
-    return res.status(500).json({
-      error: 'Erro ao buscar pedidos com produtos.',
-      details: error instanceof Error ? error.message : 'Erro desconhecido.',
-    });
   }
-},
 }
-
 
 export default PedidoProdutoController;

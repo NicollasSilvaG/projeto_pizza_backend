@@ -139,7 +139,6 @@ router.post('/pedido-produto', async (req, res) => {
   }
 });
 
-router.get('/pedidosall', PedidoProdutoController.buscarTodosPedidosComProdutos);
 
 router.post('/cupom', CupomController.criarCupom);
 

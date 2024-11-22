@@ -21,8 +21,8 @@ export class Cupom1731531000000 implements MigrationInterface {
                     },
                     {
                         name: 'porcentagem_desconto',
-                        type: 'varchar',
-                        length: '5',
+                        type: 'int',
+                        length: '10',
                     },
                     {
                         name: 'status',

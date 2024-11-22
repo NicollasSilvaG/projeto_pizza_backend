@@ -18,11 +18,7 @@ export class Pedido1731532000000 implements MigrationInterface {
                         type: 'varchar',
                         length: '100',
                     },
-                    {
-                        name: 'idCupom',
-                        type: 'integer',
-                        isNullable: true,
-                    },
+                
                     {
                         name: 'idEntrega',
                         type: 'integer',
@@ -43,16 +39,6 @@ export class Pedido1731532000000 implements MigrationInterface {
             })
         );
 
-        // Adicionar as chaves estrangeiras
-        await queryRunner.createForeignKey(
-            'pedido',
-            new TableForeignKey({
-                columnNames: ['idCupom'],
-                referencedTableName: 'cupom',
-                referencedColumnNames: ['idCupom'],
-                onDelete: 'CASCADE',
-            })
-        );
 
         await queryRunner.createForeignKey(
             'pedido',

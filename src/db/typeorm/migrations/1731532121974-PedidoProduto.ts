@@ -50,6 +50,12 @@ export class PedidoProduto1731532121974 implements MigrationInterface {
                         length: '255',
                         isNullable: true,
                     },
+                    // Adicionando a coluna 'idCupom'
+                    {
+                        name: 'idCupom',
+                        type: 'integer',
+                        isNullable: true,  // Caso o cupom não seja obrigatório
+                    },
                 ],
             })
         );
@@ -74,6 +80,18 @@ export class PedidoProduto1731532121974 implements MigrationInterface {
                 onDelete: 'CASCADE',
             })
         );
+
+        // Adicionando a chave estrangeira para 'idCupom'
+        await queryRunner.createForeignKey(
+            'pedido_e_produto',
+            new TableForeignKey({
+                columnNames: ['idCupom'],
+                referencedTableName: 'cupom',
+                referencedColumnNames: ['idCupom'],
+                onDelete: 'SET NULL',  // Quando o cupom for excluído, o valor de 'idCupom' será setado para NULL
+                onUpdate: 'CASCADE',  // Quando o cupom for atualizado, a alteração será propagada
+            })
+        );
     }
 
     public async down(queryRunner: QueryRunner): Promise<void> {
@@ -82,7 +100,7 @@ export class PedidoProduto1731532121974 implements MigrationInterface {
         if (table) {
             // Remover as chaves estrangeiras
             const foreignKeys = table.foreignKeys.filter(
-                (fk) => fk.columnNames.indexOf('idPedido') !== -1 || fk.columnNames.indexOf('idProduto') !== -1
+                (fk) => fk.columnNames.indexOf('idPedido') !== -1 || fk.columnNames.indexOf('idProduto') !== -1 || fk.columnNames.indexOf('idCupom') !== -1
             );
             await queryRunner.dropForeignKeys('pedido_e_produto', foreignKeys);
         }

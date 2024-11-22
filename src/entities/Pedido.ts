@@ -19,10 +19,6 @@ export class Pedido {
 
     @Column({ type: 'varchar', length: 100})
     status: string;
-
-    @ManyToOne(() => Cupom, (cupom) => cupom.pedidos, { nullable: true })
-    @JoinColumn({ name: "idCupom" })
-    cupom: Cupom;
   
     @ManyToOne(() => Entrega, (entrega) => entrega.pedidos, { nullable: true })
     @JoinColumn({ name: "idEntrega" })

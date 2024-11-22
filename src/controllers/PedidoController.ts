@@ -1,11 +1,9 @@
 import { AppDataSource } from '../data-source';
 import { Pedido } from '../entities/Pedido';
-import { PedidoProduto } from '../entities/PedidoProduto';
 import { Request, Response } from 'express';
 import { Cupom } from '../entities/Cupom';
 import { Entrega } from '../entities/Entrega';
 import { Usuario } from '../entities/Usuario';
-import { Produto } from '../entities/Produto';
 import { DeepPartial } from 'typeorm';
 
 const PedidoController = {
@@ -45,7 +43,6 @@ const PedidoController = {
         status,
         tipo_pagamento,
         usuario,
-        cupom,
         entrega,
       };
     
@@ -70,7 +67,7 @@ const PedidoController = {
 
       // Buscar todos os pedidos com seus relacionamentos
       const pedidos = await pedidoRepository.find({
-        relations: ['usuario', 'cupom', 'entrega'], // Incluindo os relacionamentos necessários
+        relations: ['usuario', 'entrega'], // Incluindo os relacionamentos necessários
       });
 
       if (!pedidos || pedidos.length === 0) {
