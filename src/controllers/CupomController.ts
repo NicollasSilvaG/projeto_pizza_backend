@@ -134,6 +134,46 @@ const CupomController = {
       });
     }
   },
+// Aplicar um cupom e decrementar sua quantidade
+aplicarCupom: async (req: Request, res: Response): Promise<Response> => {
+  const { codigo } = req.body; // O código do cupom será passado no corpo da requisição
+
+  try {
+    // Buscar o cupom pelo código
+    const cupom = await cupomRepository.findOne({ where: { codigo } });
+
+    if (!cupom) {
+      return res.status(404).json({ error: 'Cupom não encontrado.' });
+    }
+
+    if (cupom.quantidade <= 0 || cupom.status === 'inativo') {
+      return res.status(400).json({ error: 'Este cupom não está mais ativo ou não possui quantidade disponível.' });
+    }
+
+    // Decrementar a quantidade do cupom
+    cupom.quantidade -= 1;
+
+    // Alterar o status para inativo se a quantidade chegar a 0
+    if (cupom.quantidade === 0) {
+      cupom.status = 'inativo';
+    }
+
+    // Salvar as alterações no banco de dados
+    const cupomAtualizado = await cupomRepository.save(cupom);
+
+    return res.status(200).json({
+      message: 'Cupom aplicado com sucesso.',
+      cupom: cupomAtualizado,
+    });
+  } catch (error) {
+    console.error('Erro ao aplicar cupom:', error);
+    return res.status(500).json({
+      error: 'Erro ao aplicar cupom.',
+      details: error instanceof Error ? error.message : 'Erro desconhecido.',
+    });
+  }
+},
 };
+
 
 export default CupomController;

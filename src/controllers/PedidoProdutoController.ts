@@ -79,6 +79,28 @@ const PedidoProdutoController = {
       console.error('Erro ao adicionar produtos ao pedido:', error);
       throw new Error(`Erro ao adicionar produtos ao pedido`);
     }
+  },
+
+  buscarCarrinho: async (idPedido: number): Promise<any> => {
+    try {
+      const pedidoProdutoRepository = AppDataSource.getRepository(PedidoProduto);
+      
+      // Buscar todos os produtos do pedido especificado
+      const pedidoProdutos = await pedidoProdutoRepository.find({
+        where: { pedido: { idPedido } },  // Filtra pelos produtos do pedido específico
+        relations: ['pedido', 'produto', 'cupom'],  // Relacionamentos para carregar os dados completos
+      });
+
+      // Verificar se foram encontrados produtos no pedido
+      if (!pedidoProdutos || pedidoProdutos.length === 0) {
+        throw new Error(`Nenhum produto encontrado no pedido com ID ${idPedido}.`);
+      }
+
+      return pedidoProdutos;
+    } catch (error) {
+      console.error('Erro ao buscar produtos do carrinho do pedido:', error);
+      throw new Error(`Erro ao buscar produtos do carrinho para o pedido com ID ${idPedido}`);
+    }
   }
 }
 

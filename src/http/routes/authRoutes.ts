@@ -148,6 +148,17 @@ router.post('/pedido-produto', async (req, res) => {
   }
 });
 
+router.get('/carrinho/:idPedido', async (req, res) => {
+  try {
+    const idPedido = parseInt(req.params.idPedido, 10);
+    const produtos = await PedidoProdutoController.buscarCarrinho(idPedido);
+    res.json(produtos);
+  } catch (error) {
+    res.status(500).json({ message: error });
+  }
+});
+
+
 
 router.post('/cupom', CupomController.criarCupom);
 
@@ -161,6 +172,8 @@ router.get('/cupom/:idCupom', CupomController.buscarCupomPorId);
 router.put('/cupom/:idCupom', CupomController.atualizarCupom);
 
 router.delete('/cupom/:idCupom', CupomController.deletarCupom);
+
+router.post('/aplicar-cupom', CupomController.aplicarCupom);
 
 router.post('/entrega', EntregaController.criarEntrega);
 
