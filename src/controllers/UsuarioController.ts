@@ -80,3 +80,84 @@ export const loginUsuario = async (req: Request, res: Response) => {
     }
 };
 
+export const buscarUsuarios = async (req: Request, res: Response) => {
+    const usuarioRepository = AppDataSource.getRepository(Usuario);
+
+    try {
+        const usuarios = await usuarioRepository.find();
+        return res.status(200).json(usuarios);
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ error: "Erro ao buscar os usuários", details: error });
+    }
+};
+
+export const buscarUsuarioPorId = async (req: Request, res: Response) => {
+    const { id } = req.params;
+    const usuarioRepository = AppDataSource.getRepository(Usuario);
+
+    try {
+        const usuario = await usuarioRepository.findOne({ where: { idUsuario: parseInt(id, 10) } });
+        if (!usuario) {
+            return res.status(404).json({ error: "Usuário não encontrado" });
+        }
+        return res.status(200).json(usuario);
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ error: "Erro ao buscar o usuário", details: error });
+    }
+};
+
+export const deletarUsuario = async (req: Request, res: Response) => {
+    const { id } = req.params;
+    const usuarioRepository = AppDataSource.getRepository(Usuario);
+
+    try {
+        const usuario = await usuarioRepository.findOne({ where: { idUsuario: parseInt(id, 10) } });
+        if (!usuario) {
+            return res.status(404).json({ error: "Usuário não encontrado" });
+        }
+
+        await usuarioRepository.delete(usuario.idUsuario);
+        return res.status(200).json({ message: "Usuário deletado com sucesso" });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ error: "Erro ao deletar o usuário", details: error });
+    }
+};
+
+export const atualizarUsuario = async (req: Request, res: Response) => {
+    const { id } = req.params;
+    const { nome, email, senha, telefone, rua, cidade, uf, cep, bairro, complemento } = req.body;
+    const usuarioRepository = AppDataSource.getRepository(Usuario);
+
+    try {
+        const usuario = await usuarioRepository.findOne({ where: { idUsuario: parseInt(id, 10) } });
+        if (!usuario) {
+            return res.status(404).json({ error: "Usuário não encontrado" });
+        }
+
+        // Atualizar campos somente se enviados no corpo da requisição
+        if (nome) usuario.nome = nome;
+        if (email) usuario.email = email;
+        if (senha) {
+            const hashedSenha = await bcrypt.hash(senha, 10);
+            usuario.senha = hashedSenha;
+        }
+        if (telefone) usuario.telefone = telefone;
+        if (rua) usuario.rua = rua;
+        if (cidade) usuario.cidade = cidade;
+        if (uf) usuario.uf = uf;
+        if (cep) usuario.cep = cep;
+        if (bairro) usuario.bairro = bairro;
+        if (complemento) usuario.complemento = complemento;
+
+        await usuarioRepository.save(usuario);
+        return res.status(200).json({ message: "Usuário atualizado com sucesso", usuario });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ error: "Erro ao atualizar o usuário", details: error });
+    }
+};
+
+

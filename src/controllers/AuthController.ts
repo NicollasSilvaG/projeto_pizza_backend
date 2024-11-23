@@ -80,4 +80,89 @@ async login(req: Request, res: Response): Promise<Response> {
     return res.status(500).json({ error: 'Erro ao realizar login' });
   }
 }
+
+async buscarAdmin(req: Request, res: Response): Promise<Response> {
+  try {
+    const usuarioRepository = AppDataSource.getRepository(Autenticacao);
+    const usuarios = await usuarioRepository.find();
+    return res.status(200).json(usuarios);
+  } catch (error) {
+    console.error('Erro ao buscar usuários:', error);
+    return res.status(500).json({ error: 'Erro ao buscar usuários' });
+  }
+}
+
+// Método para buscar um usuário por ID
+async buscarPorIdAdmin(req: Request, res: Response): Promise<Response> {
+  const { id } = req.params;
+
+  try {
+    const usuarioRepository = AppDataSource.getRepository(Autenticacao);
+    const usuario = await usuarioRepository.findOneBy({ idAutenticacao: Number(id) });
+
+    if (!usuario) {
+      return res.status(404).json({ error: 'Usuário não encontrado.' });
+    }
+
+    return res.status(200).json(usuario);
+  } catch (error) {
+    console.error('Erro ao buscar usuário por ID:', error);
+    return res.status(500).json({ error: 'Erro ao buscar usuário por ID' });
+  }
+}
+
+// Método para atualizar um usuário
+async atualizarAdmin(req: Request, res: Response): Promise<Response> {
+  const { id } = req.params;
+  const { nome, login, senha } = req.body;
+
+  if (!nome || !login || !senha) {
+    return res.status(400).json({ error: 'Nome, login e senha são obrigatórios.' });
+  }
+
+  try {
+    const usuarioRepository = AppDataSource.getRepository(Autenticacao);
+    const usuario = await usuarioRepository.findOneBy({ idAutenticacao: Number(id) });
+
+    if (!usuario) {
+      return res.status(404).json({ error: 'Usuário não encontrado.' });
+    }
+
+    // Atualiza os campos
+    usuario.nome = nome;
+    usuario.login = login;
+    usuario.senha = await bcrypt.hash(senha, 10); // Criptografa a nova senha
+
+    await usuarioRepository.save(usuario);
+
+    return res.status(200).json({
+      message: 'Usuário atualizado com sucesso!',
+      usuario: { nome: usuario.nome, login: usuario.login },
+    });
+  } catch (error) {
+    console.error('Erro ao atualizar usuário:', error);
+    return res.status(500).json({ error: 'Erro ao atualizar usuário' });
+  }
+}
+
+// Método para deletar um usuário
+async deletarAdmin(req: Request, res: Response): Promise<Response> {
+  const { id } = req.params;
+
+  try {
+    const usuarioRepository = AppDataSource.getRepository(Autenticacao);
+    const usuario = await usuarioRepository.findOneBy({ idAutenticacao: Number(id) });
+
+    if (!usuario) {
+      return res.status(404).json({ error: 'Usuário não encontrado.' });
+    }
+
+    await usuarioRepository.remove(usuario);
+
+    return res.status(200).json({ message: 'Usuário deletado com sucesso.' });
+  } catch (error) {
+    console.error('Erro ao deletar usuário:', error);
+    return res.status(500).json({ error: 'Erro ao deletar usuário' });
+  }
+}
 }

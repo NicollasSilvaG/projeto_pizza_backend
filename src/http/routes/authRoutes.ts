@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { AppDataSource } from '../../data-source';
 import cors from 'cors';  // Importando o CORS
 import { AuthController } from '../../controllers/AuthController';
-import { cadastrarUsuario, loginUsuario } from '../../controllers/UsuarioController';
+import { cadastrarUsuario, loginUsuario, buscarUsuarios, buscarUsuarioPorId, deletarUsuario, atualizarUsuario} from '../../controllers/UsuarioController';
 import ProdutoController from '../../controllers/ProdutoController';
 import PedidoController from '../../controllers/PedidoController'; 
 import PedidoProdutoController from '../../controllers/PedidoProdutoController';// Verifique o caminho
@@ -36,6 +36,11 @@ router.post('/login', async (req, res) => {
   }
 });
 
+router.get('/usuariosAdmin', authController.buscarAdmin);
+router.get('/usuariosAdmin/:id', authController.buscarPorIdAdmin);
+router.put('/usuariosAdmin/:id', authController.atualizarAdmin);
+router.delete('/usuariosAdmin/:id', authController.deletarAdmin);
+
 router.post('/cadastro', async (req, res) => {
   try {
     await cadastrarUsuario(req, res);  // Usando a função cadastrarUsuario diretamente
@@ -56,7 +61,11 @@ router.post('/loginuser', async (req, res) => {
   }
 });
 
-// Rota para adicionar um produto
+router.get('/usuarios', buscarUsuarios);
+router.get('/usuarios/:id', buscarUsuarioPorId);
+router.delete('/usuarios/:id', deletarUsuario);
+router.put('/usuarios/:id', atualizarUsuario);
+
 router.post('/produto', upload.single('imagem'), async (req, res) => {
   try {
     await ProdutoController.create(req, res);  // Usando o ProdutoController para criar um produto
