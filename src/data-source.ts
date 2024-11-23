@@ -19,6 +19,8 @@ import { AddImagem1731977756462 } from "./db/typeorm/migrations/1731977756462-Ad
 import { AlterColumnPorcentagem1732222752363 } from "./db/typeorm/migrations/1732222752363-AlterColumnPorcentagem";
 import { AddIdCupomToPedidoProduto1632229775486 } from "./db/typeorm/migrations/1732229775486-AddColumnPedProd";
 import { RemoveIdCupomFromPedido1648256730482 } from "./db/typeorm/migrations/1732232890326-RemoverIdCupom";//import { AddColumnPedProd1732229775486 } from "./db/typeorm/migrations/1732229775486-AddColumnPedProd";
+import { AddDataEntregaToEntrega1731530000000 } from "./db/typeorm/migrations/1732383786327-AddCampoDataEntrega";
+import { AddCampoDataPedido1732384017204 } from "./db/typeorm/migrations/1732384017204-AddCampoDataPedido";
 
 export const AppDataSource = new DataSource({
     type: "postgres",
@@ -46,6 +48,8 @@ export const AppDataSource = new DataSource({
         AddImagem1731977756462,
         AlterColumnPorcentagem1732222752363,
         AddIdCupomToPedidoProduto1632229775486,
+        AddDataEntregaToEntrega1731530000000,
+        AddCampoDataPedido1732384017204
         //RemoveIdCupomFromPedido1648256730482
 
     ],

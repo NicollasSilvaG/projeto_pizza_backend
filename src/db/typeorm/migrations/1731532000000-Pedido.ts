@@ -35,6 +35,11 @@ export class Pedido1731532000000 implements MigrationInterface {
                         isNullable: false,
 
                     },
+                    {
+                        name: 'dataPedido',
+                        type: 'timestamp',
+                        default: 'CURRENT_TIMESTAMP', // Valor padrão é a data e hora atual
+                    },
                 ],
             })
         );

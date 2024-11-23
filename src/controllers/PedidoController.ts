@@ -9,18 +9,16 @@ import { DeepPartial } from 'typeorm';
 const PedidoController = {
   // Método para criar um pedido
   criarPedido: async (req: Request, res: Response): Promise<Response> => {
-    console.log(req.body);  // Adicione essa linha para depurar
-    let { status, idCupom, idEntrega, tipo_pagamento, idUsuario } = req.body;  // Usar 'let' em vez de 'const'
+    let { status, idCupom, idEntrega, tipo_pagamento, idUsuario, dataPedido } = req.body; // Incluído o campo dataPedido
 
-    
     try {
       const pedidoRepository = AppDataSource.getRepository(Pedido);
       const usuarioRepository = AppDataSource.getRepository(Usuario);
       const cupomRepository = AppDataSource.getRepository(Cupom);
       const entregaRepository = AppDataSource.getRepository(Entrega);
-    
+
       // Validação do usuário
-      const usuario = await usuarioRepository.findOne({ where: { "idUsuario": idUsuario } });
+      const usuario = await usuarioRepository.findOne({ where: { idUsuario } });
       if (!usuario) {
         return res.status(404).json({ error: 'Usuário não encontrado.' });
       }
@@ -28,30 +26,32 @@ const PedidoController = {
       if (!status || !tipo_pagamento) {
         return res.status(400).json({ error: 'Status e tipo_pagamento são obrigatórios.' });
       }
-    
-      const cupom = await cupomRepository.findOne({ where: { "idCupom": idCupom } });
+
+      const cupom = await cupomRepository.findOne({ where: { idCupom } });
       if (!cupom) {
-        return res.status(404).json({ error: 'Usuário não encontrado.' });
+        return res.status(404).json({ error: 'Cupom não encontrado.' });
       }
-        
-    const entrega = await entregaRepository.findOne({ where: { "idEntrega": idEntrega } });
+
+      const entrega = await entregaRepository.findOne({ where: { idEntrega } });
       if (!entrega) {
-        return res.status(404).json({ error: 'Usuário não encontrado.' });
+        return res.status(404).json({ error: 'Entrega não encontrada.' });
       }
-          // Criar o novo pedido (sem incluir produtos)
+
       const novoPedido: DeepPartial<Pedido> = {
         status,
         tipo_pagamento,
         usuario,
         entrega,
+        dataPedido: dataPedido ? new Date(dataPedido) : new Date(), // Incluindo o campo dataPedido
       };
-    
+
       // Salvar o pedido
       const pedidoSalvo = await pedidoRepository.save(novoPedido);
-    
+
       return res.status(201).json({
         message: 'Pedido criado com sucesso.',
         idPedido: pedidoSalvo.idPedido,
+        dataPedido: pedidoSalvo.dataPedido, // Retornando o campo no response
       });
     } catch (error) {
       console.error('Erro ao criar pedido:', error);
@@ -61,6 +61,7 @@ const PedidoController = {
       });
     }
   },
+
   buscarTodosPedidos: async (req: Request, res: Response): Promise<Response> => {
     try {
       const pedidoRepository = AppDataSource.getRepository(Pedido);
@@ -74,7 +75,12 @@ const PedidoController = {
         return res.status(404).json({ error: 'Nenhum pedido encontrado.' });
       }
 
-      return res.status(200).json(pedidos);
+      return res.status(200).json(
+        pedidos.map((pedido) => ({
+          ...pedido,
+          dataPedido: pedido.dataPedido, // Incluindo o campo no response
+        }))
+      );
     } catch (error) {
       console.error('Erro ao buscar pedidos:', error);
       return res.status(500).json({
@@ -84,6 +90,5 @@ const PedidoController = {
     }
   },
 };
-
 
 export default PedidoController;

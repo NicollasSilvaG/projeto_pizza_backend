@@ -101,7 +101,56 @@ const PedidoProdutoController = {
       console.error('Erro ao buscar produtos do carrinho do pedido:', error);
       throw new Error(`Erro ao buscar produtos do carrinho para o pedido com ID ${idPedido}`);
     }
+  },
+
+  removerProdutoDoCarrinho: async (idPedido: number, idProduto: number): Promise<void> => {
+    try {
+      const pedidoProdutoRepository = AppDataSource.getRepository(PedidoProduto);
+
+      // Buscar o produto do pedido que será removido
+      const pedidoProduto = await pedidoProdutoRepository.findOne({
+        where: { 
+          pedido: { idPedido },
+          produto: { idProduto }
+        },
+        relations: ['pedido', 'produto'],  // Garantir que as relações sejam carregadas
+      });
+
+      if (!pedidoProduto) {
+        throw new Error(`Produto com ID ${idProduto} não encontrado no pedido com ID ${idPedido}.`);
+      }
+
+      // Remover o produto do pedido
+      await pedidoProdutoRepository.remove(pedidoProduto);
+
+      console.log(`Produto com ID ${idProduto} removido do pedido com ID ${idPedido}.`);
+    } catch (error) {
+      console.error('Erro ao remover produto do carrinho:', error);
+      throw new Error(`Erro ao remover produto do carrinho para o pedido com ID ${idPedido}`);
+    }
+  },
+
+removerTodosProdutosDoCarrinho: async (idPedido: number): Promise<void> => {
+  try {
+    const pedidoProdutoRepository = AppDataSource.getRepository(PedidoProduto);
+
+    // Buscar todos os produtos do pedido
+    const pedidoProdutos = await pedidoProdutoRepository.find({
+      where: { pedido: { idPedido } },  // Filtra todos os produtos do pedido
+    });
+
+    if (!pedidoProdutos || pedidoProdutos.length === 0) {
+      throw new Error(`Nenhum produto encontrado no pedido com ID ${idPedido}.`);
+    }
+
+    // Remover todos os produtos do pedido
+    await pedidoProdutoRepository.remove(pedidoProdutos);
+
+    console.log(`Todos os produtos foram removidos do pedido com ID ${idPedido}.`);
+  } catch (error) {
+    console.error('Erro ao remover todos os produtos do carrinho:', error);
+    throw new Error(`Erro ao remover todos os produtos do carrinho para o pedido com ID ${idPedido}`);
   }
 }
-
+}
 export default PedidoProdutoController;

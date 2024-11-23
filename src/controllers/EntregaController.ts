@@ -5,17 +5,17 @@ import { Entrega } from '../entities/Entrega'; // Alterar o caminho conforme nec
 const entregaRepository = AppDataSource.getRepository(Entrega);
 
 const EntregaController = {
-
   // Criar uma nova entrega
   criarEntrega: async (req: Request, res: Response): Promise<Response> => {
-    const { entrega, retirada, status } = req.body;
+    const { entrega, retirada, status, dataEntrega } = req.body; // Incluído dataEntrega
 
     try {
       // Criar a nova entrega
       const novaEntrega = entregaRepository.create({
         entrega,
         retirada,
-        status
+        status,
+        dataEntrega: dataEntrega ? new Date(dataEntrega) : new Date(), // Configurando dataEntrega
       });
 
       // Salvar a entrega no banco de dados
@@ -25,7 +25,6 @@ const EntregaController = {
         message: 'Entrega criada com sucesso.',
         entrega: entregaSalva,
       });
-
     } catch (error) {
       console.error('Erro ao criar entrega:', error);
       return res.status(500).json({
@@ -39,7 +38,13 @@ const EntregaController = {
   buscarEntregas: async (req: Request, res: Response): Promise<Response> => {
     try {
       const entregas = await entregaRepository.find();
-      return res.status(200).json(entregas);
+
+      return res.status(200).json(
+        entregas.map((entrega) => ({
+          ...entrega,
+          dataEntrega: entrega.dataEntrega, // Garantindo o retorno de dataEntrega
+        }))
+      );
     } catch (error) {
       console.error('Erro ao buscar entregas:', error);
       return res.status(500).json({
@@ -73,7 +78,7 @@ const EntregaController = {
   // Atualizar uma entrega pelo id
   atualizarEntrega: async (req: Request, res: Response): Promise<Response> => {
     const { idEntrega } = req.params;
-    const { entrega, retirada, status } = req.body;
+    const { entrega, retirada, status, dataEntrega } = req.body; // Incluído dataEntrega
 
     try {
       const entregaExistente = await entregaRepository.findOne({ where: { idEntrega: Number(idEntrega) } });
@@ -86,6 +91,7 @@ const EntregaController = {
       entregaExistente.entrega = entrega;
       entregaExistente.retirada = retirada;
       entregaExistente.status = status;
+      entregaExistente.dataEntrega = dataEntrega ? new Date(dataEntrega) : entregaExistente.dataEntrega; // Atualizar dataEntrega
 
       const entregaAtualizada = await entregaRepository.save(entregaExistente);
 

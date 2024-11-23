@@ -157,6 +157,29 @@ router.get('/carrinho/:idPedido', async (req, res) => {
     res.status(500).json({ message: error });
   }
 });
+router.delete('/carrinho/:idPedido/removerall', async (req, res) => {
+  const { idPedido } = req.params;
+
+  try {
+    // Chama o método para remover todos os produtos do pedido
+    await PedidoProdutoController.removerTodosProdutosDoCarrinho(Number(idPedido));
+    return res.status(200).json({ message: `Todos os produtos foram removidos do carrinho do pedido com ID ${idPedido}.` });
+  } catch (error) {
+    return res.status(400).json({ error: error });
+  }
+});
+
+router.delete('/carrinho/:idPedido/produto/:idProduto', async (req, res) => {
+  const { idPedido, idProduto } = req.params;
+
+  try {
+    // Chama o método para remover um produto específico
+    await PedidoProdutoController.removerProdutoDoCarrinho(Number(idPedido), Number(idProduto));
+    return res.status(200).json({ message: `Produto com ID ${idProduto} removido do carrinho com sucesso.` });
+  } catch (error) {
+    return res.status(400).json({ error: error });
+  }
+});
 
 
 

@@ -28,6 +28,11 @@ export class Entrega1731530000000 implements MigrationInterface {
                         type: 'varchar',
                         length: '100',
                     },
+                    {
+                        name: 'dataEntrega',
+                        type: 'timestamp', // Alterado para "timestamp"
+                        default: 'CURRENT_TIMESTAMP', // Valor padrão é a data e hora atual
+                    },
                 ],
             })
         );

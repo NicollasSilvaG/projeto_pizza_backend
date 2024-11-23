@@ -42,4 +42,10 @@ export class Pedido {
     get produtos() {
         return this.pedidoProdutos.map(pp => pp.produto);
     }
+
+    @Column({
+        type: 'timestamp',
+        default: () => 'CURRENT_TIMESTAMP', // Define o valor padrão como o horário atual
+    })
+    dataPedido: Date;
 }
