@@ -5,13 +5,23 @@ import { Pedido } from '../entities/Pedido';
 import { Produto } from '../entities/Produto'; 
 import { In } from 'typeorm';
 import { Cupom } from '../entities/Cupom'; 
+import { Usuario } from '../entities/Usuario';
 
 const PedidoProdutoController = {
-  adicionarProdutosAoPedido: async (pedido: Pedido, produtos: { idProduto: number; quantidade: number; precoUnitario: number; desconto: number; observacoes: string, idCupom: number}[]): Promise<number> => {
+  adicionarProdutosAoPedido: async (usuarioId: number, produtos: { idProduto: number; quantidade: number; precoUnitario: number; desconto: number; observacoes: string; idUsuario: number, idCupom: number}[]): Promise<number> => {
     try {
       const produtoRepository = AppDataSource.getRepository(Produto);
       const pedidoProdutoRepository = AppDataSource.getRepository(PedidoProduto);
       const cupomRepository = AppDataSource.getRepository(Cupom);
+      const pedidoRepository = AppDataSource.getRepository(Pedido);
+      const usuarioRepository = AppDataSource.getRepository(Usuario);
+      const usuario = await usuarioRepository.findOne({
+         where: { idUsuario: usuarioId },
+      });
+
+      if (!usuario) {
+        throw new Error(`Usuário com ID ${usuarioId} não encontrado.`);
+      }
 
       // Verificar se os produtos existem no banco
       const produtosIds = produtos.map(p => p.idProduto);
@@ -25,8 +35,11 @@ const PedidoProdutoController = {
 
       let valorTotalPedido = 0;
 
+      // Criar um pedido vazio inicialmente
+      let pedido: Pedido;
+
       // Adicionar os produtos ao pedido
-      const pedidoProdutos = produtosEncontrados.map(async (produto) => {
+      const pedidoProdutos = await Promise.all(produtosEncontrados.map(async (produto) => {
         const produtoData = produtos.find(p => p.idProduto === produto.idProduto);
 
         if (!produtoData) {
@@ -34,7 +47,6 @@ const PedidoProdutoController = {
         }
 
         const pedidoProduto = new PedidoProduto();
-        pedidoProduto.pedido = pedido;
         pedidoProduto.produto = produto;
         pedidoProduto.quantidade = produtoData.quantidade || 1;
 
@@ -43,7 +55,6 @@ const PedidoProdutoController = {
 
         // Calcular o valor total do produto (com desconto aplicado)
         let valorProduto = pedidoProduto.precoUnitario * produtoData.quantidade;
-
         pedidoProduto.valorTotal = parseFloat(valorProduto.toFixed(2));
 
         // Verificar e aplicar o desconto do cupom
@@ -67,11 +78,22 @@ const PedidoProdutoController = {
 
         pedidoProduto.desconto = produtoData.desconto || 0;
         pedidoProduto.observacoes = produtoData.observacoes || '';
+
+        // Inicializar o pedido se for o primeiro produto
+        if (!pedido) {
+          pedido = new Pedido();
+          pedido.usuario = usuario;  // Agora adicionando apenas o idUsuario
+          pedido.status = 'em andamento';  // Definindo como 'em andamento'
+          pedido.dataPedido = new Date();
+          pedido = await pedidoRepository.save(pedido);
+        }
+
+        pedidoProduto.pedido = pedido; // Associar o pedido ao produto
         return pedidoProduto;
-      });
+      }));
 
       // Salvar os registros na tabela de junção PedidoProduto
-      await pedidoProdutoRepository.save(await Promise.all(pedidoProdutos));
+      await pedidoProdutoRepository.save(pedidoProdutos);
 
       // Retornar o valor total do pedido
       return valorTotalPedido;
@@ -80,7 +102,6 @@ const PedidoProdutoController = {
       throw new Error(`Erro ao adicionar produtos ao pedido`);
     }
   },
-
   buscarCarrinho: async (idPedido: number): Promise<any> => {
     try {
       const pedidoProdutoRepository = AppDataSource.getRepository(PedidoProduto);
@@ -103,54 +124,28 @@ const PedidoProdutoController = {
     }
   },
 
-  removerProdutoDoCarrinho: async (idPedido: number, idProduto: number): Promise<void> => {
+  removerTodosProdutosDoCarrinho: async (idPedido: number): Promise<void> => {
     try {
       const pedidoProdutoRepository = AppDataSource.getRepository(PedidoProduto);
-
-      // Buscar o produto do pedido que será removido
-      const pedidoProduto = await pedidoProdutoRepository.findOne({
-        where: { 
-          pedido: { idPedido },
-          produto: { idProduto }
-        },
-        relations: ['pedido', 'produto'],  // Garantir que as relações sejam carregadas
+      
+      // Buscar os produtos associados ao pedido
+      const pedidoProdutos = await pedidoProdutoRepository.find({
+        where: { pedido: { idPedido } },  // Filtra pelos produtos do pedido específico
       });
-
-      if (!pedidoProduto) {
-        throw new Error(`Produto com ID ${idProduto} não encontrado no pedido com ID ${idPedido}.`);
+  
+      if (!pedidoProdutos || pedidoProdutos.length === 0) {
+        throw new Error(`Nenhum produto encontrado no pedido com ID ${idPedido}.`);
       }
-
-      // Remover o produto do pedido
-      await pedidoProdutoRepository.remove(pedidoProduto);
-
-      console.log(`Produto com ID ${idProduto} removido do pedido com ID ${idPedido}.`);
+  
+      // Remover todos os produtos associados ao pedido
+      await pedidoProdutoRepository.remove(pedidoProdutos);
+      
+      console.log(`Produtos removidos com sucesso do carrinho ${idPedido}`);
     } catch (error) {
-      console.error('Erro ao remover produto do carrinho:', error);
-      throw new Error(`Erro ao remover produto do carrinho para o pedido com ID ${idPedido}`);
+      console.error('Erro ao remover produtos do carrinho:', error);
+      throw new Error(`Erro ao remover produtos do carrinho para o pedido com ID ${idPedido}`);
     }
-  },
-
-removerTodosProdutosDoCarrinho: async (idPedido: number): Promise<void> => {
-  try {
-    const pedidoProdutoRepository = AppDataSource.getRepository(PedidoProduto);
-
-    // Buscar todos os produtos do pedido
-    const pedidoProdutos = await pedidoProdutoRepository.find({
-      where: { pedido: { idPedido } },  // Filtra todos os produtos do pedido
-    });
-
-    if (!pedidoProdutos || pedidoProdutos.length === 0) {
-      throw new Error(`Nenhum produto encontrado no pedido com ID ${idPedido}.`);
-    }
-
-    // Remover todos os produtos do pedido
-    await pedidoProdutoRepository.remove(pedidoProdutos);
-
-    console.log(`Todos os produtos foram removidos do pedido com ID ${idPedido}.`);
-  } catch (error) {
-    console.error('Erro ao remover todos os produtos do carrinho:', error);
-    throw new Error(`Erro ao remover todos os produtos do carrinho para o pedido com ID ${idPedido}`);
   }
-}
-}
+};
+
 export default PedidoProdutoController;

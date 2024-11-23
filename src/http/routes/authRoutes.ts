@@ -138,7 +138,7 @@ router.post('/pedido-produto', async (req, res) => {
     }
 
     // Agora passando os dados necessários diretamente para o controller
-    await PedidoProdutoController.adicionarProdutosAoPedido(pedido, produtos);
+    await PedidoProdutoController.adicionarProdutosAoPedido(pedido.idPedido, produtos); // Passando o idPedido (número)
 
     res.status(201).json({ message: 'Produtos associados ao pedido com sucesso.' });
 
@@ -169,7 +169,7 @@ router.delete('/carrinho/:idPedido/removerall', async (req, res) => {
   }
 });
 
-router.delete('/carrinho/:idPedido/produto/:idProduto', async (req, res) => {
+/*router.delete('/carrinho/:idPedido/produto/:idProduto', async (req, res) => {
   const { idPedido, idProduto } = req.params;
 
   try {
@@ -179,7 +179,7 @@ router.delete('/carrinho/:idPedido/produto/:idProduto', async (req, res) => {
   } catch (error) {
     return res.status(400).json({ error: error });
   }
-});
+});*/
 
 
 

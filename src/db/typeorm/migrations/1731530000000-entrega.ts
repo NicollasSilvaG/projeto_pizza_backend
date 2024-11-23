@@ -17,11 +17,14 @@ export class Entrega1731530000000 implements MigrationInterface {
                         name: 'entrega',
                         type: 'varchar',
                         length: '45',
+                        isNullable: true,
                     },
                     {
                         name: 'retirada',
                         type: 'varchar',
                         length: '45',
+                        isNullable: true,
+
                     },
                     {
                         name: 'status',
