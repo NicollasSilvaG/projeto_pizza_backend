@@ -232,7 +232,7 @@ router.post('/pizzaria', PizzariaController.create);
 
 router.get('/pizzarias', PizzariaController.buscarTodasPizzarias);
 
-router.post('/carrinhos/criar', carrinhoController.criarCarrinho);
+router.post('/carrinho/criar', carrinhoController.criarCarrinho);
 
 router.post('/carrinho/adicionar', carrinhoController.adicionarProdutoAoCarrinho);
 

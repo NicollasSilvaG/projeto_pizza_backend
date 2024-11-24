@@ -26,6 +26,7 @@ import { Pizzaria1732395325715 } from "./db/typeorm/migrations/1732395325715-Piz
 import { Carrinho1732406154956 } from "./db/typeorm/migrations/1732406154956-Carrinho";
 import { Carrinho } from "./entities/Carrinho";
 import { AddCarrinhoToPedidoProduto1691532000000 } from "./db/typeorm/migrations/1732406825408-AddCarrinhoAoPedido";
+import { StatusADDpedidoProduto1732481027589 } from "./db/typeorm/migrations/1732481027589-StatusADDpedido_produto";
 
 export const AppDataSource = new DataSource({
     type: "postgres",
@@ -57,7 +58,8 @@ export const AppDataSource = new DataSource({
         AddCampoDataPedido1732384017204,
         Pizzaria1732395325715,
         Carrinho1732406154956,
-        AddCarrinhoToPedidoProduto1691532000000
+        AddCarrinhoToPedidoProduto1691532000000,
+        StatusADDpedidoProduto1732481027589
         //RemoveIdCupomFromPedido1648256730482
 
     ],
