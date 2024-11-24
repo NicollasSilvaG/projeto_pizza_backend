@@ -1,7 +1,8 @@
 import { Entity, PrimaryGeneratedColumn, ManyToOne, JoinColumn, Column } from 'typeorm';
 import { Produto } from './Produto'; 
 import { Pedido } from './Pedido'; 
-import { Cupom } from './Cupom'; // Importar a entidade Cupom
+import { Cupom } from './Cupom';
+import { Carrinho } from './Carrinho'; // Importar a entidade Cupom
 
 @Entity('pedido_e_produto')
 export class PedidoProduto {
@@ -34,4 +35,15 @@ export class PedidoProduto {
 
     @Column('varchar', { length: 255, nullable: true })
     observacoes: string;
+
+    @ManyToOne(() => Carrinho, carrinho => carrinho.pedidoProdutos)
+    @JoinColumn({ name: 'idCarrinho' })
+    carrinho: Carrinho;  ;
+
+    @Column({
+        type: 'enum',
+        enum: ['carrinho', 'pedido'],
+        default: 'carrinho'
+    })
+    status: 'carrinho' | 'pedido';
 }

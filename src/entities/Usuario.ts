@@ -1,5 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from "typeorm";
 import { Pedido } from "./Pedido";
+import { Carrinho } from "./Carrinho";
 
 @Entity("usuario")
 export class Usuario {
@@ -41,4 +42,7 @@ export class Usuario {
 
     @OneToMany(() => Pedido, (pedido) => pedido.usuario)
     pedidos: Pedido[];
+
+    @OneToMany(() => Carrinho, (carrinho) => carrinho.usuario)
+    carrinhos: Carrinho[];  
 }

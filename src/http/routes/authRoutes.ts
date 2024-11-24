@@ -11,6 +11,8 @@ import CupomController  from '../../controllers/CupomController';
 import EntregaController  from '../../controllers/EntregaController';
 import CategoriaController from '../../controllers/CategoriaController';
 import upload from '../../controllers/uploadService';
+import { PizzariaController } from '../../controllers/PizzariaController';
+import { carrinhoController } from '../../controllers/CarrinhoController';
 
 
 const router = Router();
@@ -225,6 +227,19 @@ router.put('/categoria/:idCategoria', CategoriaController.atualizarCategoria);
 
 // Rota para deletar uma categoria pelo ID
 router.delete('/categoria/:idCategoria', CategoriaController.deletarCategoria);
+
+router.post('/pizzaria', PizzariaController.create);
+
+router.get('/pizzarias', PizzariaController.buscarTodasPizzarias);
+
+router.post('/carrinhos/criar', carrinhoController.criarCarrinho);
+
+router.post('/carrinho/adicionar', carrinhoController.adicionarProdutoAoCarrinho);
+
+router.get('/carrinho/consultar/:usuarioId', carrinhoController.consultarCarrinho);
+
+router.post('/carrinho/finalizar', carrinhoController.finalizarCarrinho);
+
 
 export default router;
 
