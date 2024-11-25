@@ -25,7 +25,6 @@ class ProdutoController {
     // Método para criar um novo produto
     public async create(req: Request, res: Response): Promise<Response> {
         try {
-
             const produtoRepository = AppDataSource.getRepository(Produto);
             const categoriaRepository = AppDataSource.getRepository(Categoria);
             const { nome, quantidade, preco, descricao, tamanho, categoria_idCategoria } = req.body;
@@ -61,35 +60,29 @@ class ProdutoController {
     // Método para buscar todos os produtos
     public async findAll(req: Request, res: Response): Promise<Response> {
         try {
-            const produtoRepository = AppDataSource.getRepository(Produto); // Usando AppDataSource
-            const produtos = await produtoRepository.find({ relations: ["categoria"] }); // Incluindo relação com categoria
+            const produtoRepository = AppDataSource.getRepository(Produto);
+            const produtos = await produtoRepository.find({ relations: ["categoria"] });
     
-            // Adicionando o campo 'imagemUrl' com a URL da imagem para cada produto
             const produtosComImagens = produtos.map(produto => ({
                 ...produto,
-                imagemUrl: produto.imagem ? `http://localhost:3070/${produto.imagem}` : null, // Constrói o URL completo
+                imagemUrl: produto.imagem ? `http://localhost:3070/${produto.imagem}` : null,
             }));
             
-            
-            return res.status(200).json(produtosComImagens); // Retorna os produtos com a URL da imagem
+            return res.status(200).json(produtosComImagens); 
         } catch (error) {
             console.error(error);
             return res.status(500).json({ message: "Erro ao buscar produtos." });
         }
     }
 
-
     // Método para buscar um produto por ID
     public async findOne(req: Request, res: Response): Promise<Response> {
         try {
-            const produtoRepository = AppDataSource.getRepository(Produto); // Usando AppDataSource
+            const produtoRepository = AppDataSource.getRepository(Produto);
             const produto = await produtoRepository.findOne({
-                where: { idProduto: Number(req.params.idProduto) }, // Convertendo para número
-                relations: ["categoria"] // Incluindo a relação
-                
+                where: { idProduto: Number(req.params.idProduto) },
+                relations: ["categoria"]
             });
-            
-            
 
             if (!produto) {
                 return res.status(404).json({ message: "Produto não encontrado." });
@@ -151,19 +144,20 @@ class ProdutoController {
         }
     }
     
+    // Método para deletar um produto
     public async delete(req: Request, res: Response): Promise<Response> {
         try {
-            const produtoRepository = AppDataSource.getRepository(Produto); // Usando AppDataSource
+            const produtoRepository = AppDataSource.getRepository(Produto);
             const produto = await produtoRepository.findOne({
-                where: { idProduto: Number(req.params.idProduto) }, // Aqui, a condição de busca
-                relations: ["categoria"], // Relacionamento com categoria
+                where: { idProduto: Number(req.params.idProduto) },
+                relations: ["categoria"],
             });
+
             if (!produto) {
                 return res.status(404).json({ message: "Produto não encontrado." });
             }
 
             await produtoRepository.remove(produto);
-
             return res.status(200).json({ message: "Produto deletado com sucesso." });
         } catch (error) {
             console.error(error);

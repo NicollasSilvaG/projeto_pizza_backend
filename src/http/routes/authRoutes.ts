@@ -97,6 +97,28 @@ router.get('/produto/:idProduto', async (req, res) => {
   }
 });
 
+// Rota para editar um produto
+router.put('/produto/:idProduto', upload.single('imagem'), async (req, res) => {
+  try {
+    // Usando o ProdutoController para editar um produto específico
+    await ProdutoController.update(req, res);  
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Erro ao editar o produto', details: error });
+  }
+});
+
+// Rota para excluir um produto
+router.delete('/produto/:idProduto', async (req, res) => {
+  try {
+    // Usando o ProdutoController para excluir um produto específico
+    await ProdutoController.delete(req, res);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Erro ao excluir o produto', details: error });
+  }
+});
+
 router.post('/pedido', async (req, res) => {
   try {
     await PedidoController.criarPedido(req, res);  // Usando o PedidoController para criar um pedido
