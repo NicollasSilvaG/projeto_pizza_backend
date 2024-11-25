@@ -125,7 +125,7 @@ router.get('/pedido/:idPedido', async (req, res) => {
   }
 });
 
-router.post('/pedido-produto', async (req, res) => {
+/*router.post('/pedido-produto', async (req, res) => {
   const { idPedido, produtos } = req.body; 
 
   if (!idPedido || !produtos || produtos.length === 0) {
@@ -148,7 +148,7 @@ router.post('/pedido-produto', async (req, res) => {
     console.error(error);
     res.status(500).json({ error: 'Erro ao associar produto ao pedido', details: error });
   }
-});
+});*/
 
 router.get('/carrinho/:idPedido', async (req, res) => {
   try {
@@ -232,13 +232,34 @@ router.post('/pizzaria', PizzariaController.create);
 
 router.get('/pizzarias', PizzariaController.buscarTodasPizzarias);
 
-router.post('/carrinho/criar', carrinhoController.criarCarrinho);
+router.post('/carrinhos/criar', carrinhoController.criarCarrinho);
 
 router.post('/carrinho/adicionar', carrinhoController.adicionarProdutoAoCarrinho);
 
 router.get('/carrinho/consultar/:usuarioId', carrinhoController.consultarCarrinho);
 
 router.post('/carrinho/finalizar', carrinhoController.finalizarCarrinho);
+
+router.post('/criar-pedido', async (req, res) => {
+  try {
+    const { usuarioId, produtos, idEntrega } = req.body; // Desestruturando os dados da requisição
+
+    if (!usuarioId || !produtos || produtos.length === 0 || !idEntrega) {
+      return res.status(400).json({ error: 'Dados inválidos. UsuarioId, produtos e idEntrega são necessários.' });
+    }
+
+    // Chama o método do controlador para adicionar produtos ao pedido e cria o pedido
+    const valorTotalPedido = await PedidoProdutoController.adicionarProdutosAoPedido(usuarioId, produtos, idEntrega);
+
+    return res.status(201).json({
+      message: 'Pedido criado com sucesso!',
+      valorTotalPedido,
+    });
+  } catch (error) {
+    console.error('Erro ao criar pedido:', error);
+    return res.status(500).json({ error: 'Erro ao criar o pedido.' });
+  }
+});
 
 
 export default router;

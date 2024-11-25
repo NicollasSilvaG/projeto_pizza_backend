@@ -1,22 +1,29 @@
 import { Request, Response } from 'express';
 import { AppDataSource } from '../data-source';
 import { PedidoProduto } from '../entities/PedidoProduto'; 
-import { Pedido } from '../entities/Pedido'; 
+import { Pedido, TipoPagamento } from '../entities/Pedido'; 
 import { Produto } from '../entities/Produto'; 
 import { In } from 'typeorm';
 import { Cupom } from '../entities/Cupom'; 
 import { Usuario } from '../entities/Usuario';
+import { Entrega } from '../entities/Entrega';
 
 const PedidoProdutoController = {
-  adicionarProdutosAoPedido: async (usuarioId: number, produtos: { idProduto: number; quantidade: number; precoUnitario: number; desconto: number; observacoes: string; idUsuario: number, idCupom: number}[]): Promise<number> => {
+  adicionarProdutosAoPedido: async (
+    usuarioId: number,
+    produtos: { idProduto: number; quantidade: number; precoUnitario: number; desconto: number; observacoes: string; idCupom: number }[],
+    idEntrega: number
+  ): Promise<number> => {
     try {
       const produtoRepository = AppDataSource.getRepository(Produto);
       const pedidoProdutoRepository = AppDataSource.getRepository(PedidoProduto);
       const cupomRepository = AppDataSource.getRepository(Cupom);
       const pedidoRepository = AppDataSource.getRepository(Pedido);
       const usuarioRepository = AppDataSource.getRepository(Usuario);
+      const entregaRepository = AppDataSource.getRepository(Entrega);  // Correct repository reference
+
       const usuario = await usuarioRepository.findOne({
-         where: { idUsuario: usuarioId },
+        where: { idUsuario: usuarioId },
       });
 
       if (!usuario) {
@@ -39,58 +46,75 @@ const PedidoProdutoController = {
       let pedido: Pedido;
 
       // Adicionar os produtos ao pedido
-      const pedidoProdutos = await Promise.all(produtosEncontrados.map(async (produto) => {
-        const produtoData = produtos.find(p => p.idProduto === produto.idProduto);
+      const pedidoProdutos = await Promise.all(
+        produtosEncontrados.map(async (produto) => {
+          const produtoData = produtos.find((p) => p.idProduto === produto.idProduto);
 
-        if (!produtoData) {
-          throw new Error(`Dados do produto com ID ${produto.idProduto} não encontrados.`);
-        }
-
-        const pedidoProduto = new PedidoProduto();
-        pedidoProduto.produto = produto;
-        pedidoProduto.quantidade = produtoData.quantidade || 1;
-
-        // Subtrair o desconto diretamente no precoUnitario
-        pedidoProduto.precoUnitario = produtoData.precoUnitario - (produtoData.desconto || 0);
-
-        // Calcular o valor total do produto (com desconto aplicado)
-        let valorProduto = pedidoProduto.precoUnitario * produtoData.quantidade;
-        pedidoProduto.valorTotal = parseFloat(valorProduto.toFixed(2));
-
-        // Verificar e aplicar o desconto do cupom
-        if (produtoData.idCupom) {
-          const cupom = await cupomRepository.findOne({
-            where: { idCupom: produtoData.idCupom }
-          });
-
-          if (cupom && cupom.porcentagem_desconto) {
-            const porcentagemDesconto = parseFloat(cupom.porcentagem_desconto.toString());
-            const descontoCupom = (pedidoProduto.valorTotal * porcentagemDesconto) / 100;
-            pedidoProduto.valorTotal = parseFloat((pedidoProduto.valorTotal - descontoCupom).toFixed(2));
-            pedidoProduto.cupom = cupom;
-          } else {
-            throw new Error('Cupom inválido ou sem desconto aplicado.');
+          if (!produtoData) {
+            throw new Error(`Dados do produto com ID ${produto.idProduto} não encontrados.`);
           }
-        }
 
-        // Acumular o valor total do pedido
-        valorTotalPedido += pedidoProduto.valorTotal;
+          const pedidoProduto = new PedidoProduto();
+          pedidoProduto.produto = produto;
+          pedidoProduto.quantidade = produtoData.quantidade; // Usando a quantidade definida no carrinho
 
-        pedidoProduto.desconto = produtoData.desconto || 0;
-        pedidoProduto.observacoes = produtoData.observacoes || '';
+          // Subtrair o desconto diretamente no precoUnitario
+          pedidoProduto.precoUnitario = produtoData.precoUnitario - (produtoData.desconto || 0);
 
-        // Inicializar o pedido se for o primeiro produto
-        if (!pedido) {
-          pedido = new Pedido();
-          pedido.usuario = usuario;  // Agora adicionando apenas o idUsuario
-          pedido.status = 'em andamento';  // Definindo como 'em andamento'
-          pedido.dataPedido = new Date();
-          pedido = await pedidoRepository.save(pedido);
-        }
+          // Calcular o valor total do produto (com desconto aplicado)
+          let valorProduto = pedidoProduto.precoUnitario * produtoData.quantidade;
+          pedidoProduto.valorTotal = parseFloat(valorProduto.toFixed(2));
 
-        pedidoProduto.pedido = pedido; // Associar o pedido ao produto
-        return pedidoProduto;
-      }));
+          // Verificar e aplicar o desconto do cupom
+          if (produtoData.idCupom) {
+            const cupom = await cupomRepository.findOne({
+              where: { idCupom: produtoData.idCupom },
+            });
+
+            if (cupom && cupom.porcentagem_desconto) {
+              const porcentagemDesconto = parseFloat(cupom.porcentagem_desconto.toString());
+              const descontoCupom = (pedidoProduto.valorTotal * porcentagemDesconto) / 100;
+              pedidoProduto.valorTotal = parseFloat((pedidoProduto.valorTotal - descontoCupom).toFixed(2));
+              pedidoProduto.cupom = cupom;
+            } else {
+              throw new Error('Cupom inválido ou sem desconto aplicado.');
+            }
+          }
+
+          // Acumular o valor total do pedido
+          valorTotalPedido += pedidoProduto.valorTotal;
+
+          pedidoProduto.desconto = produtoData.desconto || 0;
+          pedidoProduto.observacoes = produtoData.observacoes || '';
+
+          // Inicializar o pedido se for o primeiro produto
+          if (!pedido) {
+            pedido = new Pedido();
+            pedido.usuario = usuario; // Associando o usuário
+            pedido.status = 'em andamento'; // Definindo como 'em andamento'
+            pedido.dataPedido = new Date();
+            pedido.tipo_pagamento = TipoPagamento.CREDITO;
+
+            // Agora, em vez de 'idEntrega', você deve passar a instância de 'Entrega'
+            const entrega = await entregaRepository.findOne({
+              where: { idEntrega: idEntrega },
+            });
+            
+            
+
+            if (!entrega) {
+              throw new Error(`Entrega com ID ${idEntrega} não encontrada.`);
+            }
+
+            pedido.entrega = entrega; // Atribuindo a instância da entrega
+
+            pedido = await pedidoRepository.save(pedido);
+          }
+
+          pedidoProduto.pedido = pedido; // Associar o pedido ao produto
+          return pedidoProduto;
+        })
+      );
 
       // Salvar os registros na tabela de junção PedidoProduto
       await pedidoProdutoRepository.save(pedidoProdutos);
@@ -102,6 +126,7 @@ const PedidoProdutoController = {
       throw new Error(`Erro ao adicionar produtos ao pedido`);
     }
   },
+  // Resto dos métodos permanece o mesmo
   buscarCarrinho: async (idPedido: number): Promise<any> => {
     try {
       const pedidoProdutoRepository = AppDataSource.getRepository(PedidoProduto);
