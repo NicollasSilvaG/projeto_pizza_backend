@@ -2,18 +2,17 @@ import { Router } from 'express';
 import { AppDataSource } from '../../data-source';
 import cors from 'cors';  // Importando o CORS
 import { AuthController } from '../../controllers/AuthController';
-import { cadastrarUsuario, loginUsuario, buscarUsuarios, buscarUsuarioPorId, deletarUsuario, atualizarUsuario} from '../../controllers/UsuarioController';
+import { cadastrarUsuario, loginUsuario, buscarUsuarios, buscarUsuarioPorId, deletarUsuario, atualizarUsuario } from '../../controllers/UsuarioController';
 import ProdutoController from '../../controllers/ProdutoController';
 import PedidoController from '../../controllers/PedidoController'; 
-import PedidoProdutoController from '../../controllers/PedidoProdutoController';// Verifique o caminho
+import PedidoProdutoController from '../../controllers/PedidoProdutoController'; // Verifique o caminho
 import { Pedido } from '../../entities/Pedido';
-import CupomController  from '../../controllers/CupomController';
-import EntregaController  from '../../controllers/EntregaController';
+import CupomController from '../../controllers/CupomController';
+import EntregaController from '../../controllers/EntregaController';
 import CategoriaController from '../../controllers/CategoriaController';
 import upload from '../../controllers/uploadService';
 import { PizzariaController } from '../../controllers/PizzariaController';
 import { carrinhoController } from '../../controllers/CarrinhoController';
-
 
 const router = Router();
 const authController = new AuthController();
@@ -46,20 +45,18 @@ router.delete('/usuariosAdmin/:id', authController.deletarAdmin);
 router.post('/cadastro', async (req, res) => {
   try {
     await cadastrarUsuario(req, res);  // Usando a função cadastrarUsuario diretamente
-
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'Erro no processamento da requisição', details: error});
+    res.status(500).json({ error: 'Erro no processamento da requisição', details: error });
   }
 });
 
 router.post('/loginuser', async (req, res) => {
   try {
     await loginUsuario(req, res);  // Usando a função cadastrarUsuario diretamente
-
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'Erro no processamento da requisição', details: error});
+    res.status(500).json({ error: 'Erro no processamento da requisição', details: error });
   }
 });
 
@@ -181,6 +178,7 @@ router.get('/carrinho/:idPedido', async (req, res) => {
     res.status(500).json({ message: error });
   }
 });
+
 router.delete('/carrinho/:idPedido/removerall', async (req, res) => {
   const { idPedido } = req.params;
 
@@ -204,8 +202,6 @@ router.delete('/carrinho/:idPedido/removerall', async (req, res) => {
     return res.status(400).json({ error: error });
   }
 });*/
-
-
 
 router.post('/cupom', CupomController.criarCupom);
 
@@ -236,31 +232,46 @@ router.put('/entrega/:idEntrega', EntregaController.atualizarEntrega);
 // Rota para deletar uma entrega
 router.delete('/entrega/:idEntrega', EntregaController.deletarEntrega);
 
+// Rota para cadastrar uma nova categoria
 router.post('/categoria', CategoriaController.criarCategoria);
 
-// Rota para buscar todas as categorias
+// Rota para listar todas as categorias
 router.get('/categorias', CategoriaController.buscarCategorias);
 
 // Rota para buscar uma categoria pelo ID
 router.get('/categoria/:idCategoria', CategoriaController.buscarCategoriaPorId);
 
-// Rota para atualizar uma categoria pelo ID
+// Rota para editar uma categoria
 router.put('/categoria/:idCategoria', CategoriaController.atualizarCategoria);
 
-// Rota para deletar uma categoria pelo ID
+// Rota para excluir uma categoria
 router.delete('/categoria/:idCategoria', CategoriaController.deletarCategoria);
 
+// Rota para criar uma pizzaria
 router.post('/pizzaria', PizzariaController.create);
 
+// Rota para listar todas as pizzarias
 router.get('/pizzarias', PizzariaController.buscarTodasPizzarias);
 
-router.post('/carrinhos/criar', carrinhoController.criarCarrinho);
+// Rota para editar uma pizzaria
+router.put('/pizzaria/:idPizzaria', async (req, res) => {
+  try {
+    await PizzariaController.atualizarPizzaria(req, res);  // Chama o método de atualização de pizzaria
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Erro ao atualizar pizzaria', details: error });
+  }
+});
 
-router.post('/carrinho/adicionar', carrinhoController.adicionarProdutoAoCarrinho);
-
-router.get('/carrinho/consultar/:usuarioId', carrinhoController.consultarCarrinho);
-
-router.post('/carrinho/finalizar', carrinhoController.finalizarCarrinho);
+// Rota para deletar uma pizzaria
+router.delete('/pizzaria/:idPizzaria', async (req, res) => {
+  try {
+    await PizzariaController.deletarPizzaria(req, res);  // Chama o método de deletação de pizzaria
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Erro ao deletar pizzaria', details: error });
+  }
+});
 
 router.post('/criar-pedido', async (req, res) => {
   try {
@@ -283,6 +294,4 @@ router.post('/criar-pedido', async (req, res) => {
   }
 });
 
-
 export default router;
-
