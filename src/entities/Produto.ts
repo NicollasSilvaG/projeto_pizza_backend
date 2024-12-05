@@ -1,11 +1,10 @@
-// src/entity/Produto.ts
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, ManyToMany, JoinTable } from 'typeorm';
 import { Categoria } from './Categoria';
-import { Pedido } from './Pedido'; // Importar a entidade Pedido
+import { Pedido } from './Pedido';
 
 @Entity('produto')
 export class Produto {
-    @PrimaryGeneratedColumn({ name: 'idProduto' }) // Aqui você pode mapear explicitamente a coluna para `idProduto`
+    @PrimaryGeneratedColumn({ name: 'idProduto' }) 
     idProduto: number;
 
     @Column({ type: 'varchar', length: 45 })

@@ -1,7 +1,7 @@
 // src/entity/Cupom.ts
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
 import { Pedido } from './Pedido';
-import { PedidoProduto } from './PedidoProduto';  // Importar a entidade PedidoProduto
+import { PedidoProduto } from './PedidoProduto';  
 
 @Entity('cupom')
 export class Cupom {
@@ -23,6 +23,6 @@ export class Cupom {
   
 
     @OneToMany(() => PedidoProduto, pedidoProduto => pedidoProduto.cupom)
-    pedidoProdutos: PedidoProduto[];  // Relacionamento com PedidoProduto
+    pedidoProdutos: PedidoProduto[];  
   }
 

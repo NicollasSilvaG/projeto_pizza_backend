@@ -1,4 +1,3 @@
-// src/entity/Entrega.ts
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
 import { Pedido } from './Pedido';
 

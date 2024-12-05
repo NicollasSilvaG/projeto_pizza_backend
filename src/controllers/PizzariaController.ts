@@ -31,6 +31,30 @@ export class PizzariaController {
     }
   }
 
+  // Método para buscar uma única pizzaria pelo ID
+public static async buscarPizzariaPorId(req: Request, res: Response): Promise<Response> {
+  const { idPizzaria } = req.params;
+
+  if (!idPizzaria) {
+    return res.status(400).json({ error: 'ID da pizzaria é obrigatório.' });
+  }
+
+  try {
+    const pizzariaRepository = AppDataSource.getRepository(Pizzaria);
+    const pizzaria = await pizzariaRepository.findOneBy({ idPizzaria: parseInt(idPizzaria, 10) });
+
+    if (!pizzaria) {
+      return res.status(404).json({ error: `Pizzaria com ID ${idPizzaria} não encontrada.` });
+    }
+
+    return res.status(200).json(pizzaria); // Retorna os detalhes da pizzaria
+  } catch (error) {
+    console.error('Erro ao buscar a pizzaria por ID:', error);
+    return res.status(500).json({ error: 'Erro ao buscar a pizzaria.', details: error });
+  }
+}
+
+
   // Método para buscar todas as pizzarias
   public static async buscarTodasPizzarias(req: Request, res: Response): Promise<Response> {
     try {

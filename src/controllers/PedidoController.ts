@@ -89,6 +89,83 @@ const PedidoController = {
       });
     }
   },
+
+  // Método para buscar um pedido por ID
+buscarPedidoPorId: async (req: Request, res: Response): Promise<Response> => {
+  const { idPedido } = req.params;
+
+  if (!idPedido) {
+    return res.status(400).json({ error: 'ID do pedido é obrigatório.' });
+  }
+
+  try {
+    const pedidoRepository = AppDataSource.getRepository(Pedido);
+
+    // Buscar o pedido pelo ID com seus relacionamentos
+    const pedido = await pedidoRepository.findOne({
+      where: { idPedido: parseInt(idPedido, 10) },
+      relations: ['usuario', 'entrega'], // Incluindo os relacionamentos necessários
+    });
+
+    if (!pedido) {
+      return res.status(404).json({ error: `Pedido com ID ${idPedido} não encontrado.` });
+    }
+
+    return res.status(200).json({
+      ...pedido,
+      dataPedido: pedido.dataPedido, // Incluindo o campo no response
+    });
+  } catch (error) {
+    console.error('Erro ao buscar pedido por ID:', error);
+    return res.status(500).json({
+      error: 'Erro ao buscar pedido.',
+      details: error instanceof Error ? error.message : 'Erro desconhecido.',
+      });
+    }
+  },
+
+  // Método para cancelar um pedido
+cancelarPedido: async (req: Request, res: Response): Promise<Response> => {
+  const { idPedido } = req.params;
+
+  if (!idPedido) {
+    return res.status(400).json({ error: 'ID do pedido é obrigatório.' });
+  }
+
+  try {
+    const pedidoRepository = AppDataSource.getRepository(Pedido);
+
+    // Buscar o pedido pelo ID
+    const pedido = await pedidoRepository.findOne({
+      where: { idPedido: parseInt(idPedido, 10) },
+    });
+
+    if (!pedido) {
+      return res.status(404).json({ error: `Pedido com ID ${idPedido} não encontrado.` });
+    }
+
+    // Verificar se o pedido já está cancelado
+    if (pedido.status === 'Cancelado') {
+      return res.status(400).json({ error: 'O pedido já está cancelado.' });
+    }
+
+    // Atualizar o status do pedido para "Cancelado"
+    pedido.status = 'Cancelado';
+
+    await pedidoRepository.save(pedido);
+
+    return res.status(200).json({
+      message: `Pedido com ID ${idPedido} foi cancelado com sucesso.`,
+      pedido,
+    });
+  } catch (error) {
+    console.error('Erro ao cancelar pedido:', error);
+    return res.status(500).json({
+      error: 'Erro ao cancelar pedido.',
+      details: error instanceof Error ? error.message : 'Erro desconhecido.',
+      });
+    }
+  },
 };
 
 export default PedidoController;

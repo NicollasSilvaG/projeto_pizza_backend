@@ -1,4 +1,4 @@
-import { DataSource } from "typeorm";// Entidade Pedido
+import { DataSource } from "typeorm";
 import { Pedido } from "./entities/Pedido";
 import { PedidoProduto } from "./entities/PedidoProduto";
 import { Pedido1731532000000 } from "./db/typeorm/migrations/1731532000000-Pedido";
@@ -19,7 +19,7 @@ import { Autenticacao1731022435641 } from "./db/typeorm/migrations/1731022435641
 import { AddImagem1731977756462 } from "./db/typeorm/migrations/1731977756462-AddImagem";
 import { AlterColumnPorcentagem1732222752363 } from "./db/typeorm/migrations/1732222752363-AlterColumnPorcentagem";
 import { AddIdCupomToPedidoProduto1632229775486 } from "./db/typeorm/migrations/1732229775486-AddColumnPedProd";
-import { RemoveIdCupomFromPedido1648256730482 } from "./db/typeorm/migrations/1732232890326-RemoverIdCupom";//import { AddColumnPedProd1732229775486 } from "./db/typeorm/migrations/1732229775486-AddColumnPedProd";
+import { RemoveIdCupomFromPedido1648256730482 } from "./db/typeorm/migrations/1732232890326-RemoverIdCupom";
 import { AddDataEntregaToEntrega1731530000000 } from "./db/typeorm/migrations/1732383786327-AddCampoDataEntrega";
 import { AddCampoDataPedido1732384017204 } from "./db/typeorm/migrations/1732384017204-AddCampoDataPedido";
 import { Pizzaria1732395325715 } from "./db/typeorm/migrations/1732395325715-Pizzaria";
@@ -35,20 +35,17 @@ export const AppDataSource = new DataSource({
     username: "dompizzas",
     password: "201202",
     database: "dompizzas",
-    entities: [Pedido, PedidoProduto, Cupom, Entrega, Usuario, Produto, Categoria, Autenticacao, Pizzaria, Carrinho ],  // Inclui todas as entidades
+    entities: [Pedido, PedidoProduto, Cupom, Entrega, Usuario, Produto, Categoria, Autenticacao, Pizzaria, Carrinho ],  
     migrations: [
         Categoria1731371807369,
         Produto1731371833892,
 
-        // Em seguida, criamos as tabelas que podem ter referências a outras
         Usuario1731162498445,
         Cupom1731531000000,
         Entrega1731530000000,
 
-        // Depois criamos a tabela Pedido que depende de Usuario, Cupom e Entrega
         Pedido1731532000000,
 
-        // Finalmente criamos a tabela de junção PedidoProduto que depende de Pedido e Produto
         PedidoProduto1731532121974, 
         Autenticacao1731022435641,
         AddImagem1731977756462,
@@ -63,13 +60,12 @@ export const AppDataSource = new DataSource({
         //RemoveIdCupomFromPedido1648256730482
 
     ],
-    synchronize: false,  // Deixe como false em produção para não criar tabelas automaticamente
+    synchronize: false, 
 });
 
 AppDataSource.initialize()
     .then(() => {
         console.log("Data Source inicializado com sucesso!");
-        // Executando migrações (se necessário)
         AppDataSource.runMigrations()
             .then(() => {
                 console.log("Migrações aplicadas com sucesso!");

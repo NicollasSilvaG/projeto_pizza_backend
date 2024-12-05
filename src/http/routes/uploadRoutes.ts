@@ -18,7 +18,6 @@ const upload = multer({
   }),
 });
 
-// Endpoint para upload de imagem e criação de produto
 router.post('/produtos/upload', (req, res, next) => {
   upload.single('imagem')(req, res, (err) => {
     if (err) {

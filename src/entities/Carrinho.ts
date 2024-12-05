@@ -1,6 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, ManyToOne, JoinColumn, OneToMany, Column } from 'typeorm';
 import { Usuario } from './Usuario';
-import { PedidoProduto } from './PedidoProduto'; // Relacionamento com os produtos no carrinho
+import { PedidoProduto } from './PedidoProduto'; 
 
 @Entity('carrinho')
 export class Carrinho {

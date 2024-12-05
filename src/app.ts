@@ -1,17 +1,16 @@
-import "reflect-metadata";  // Importação obrigatória antes de usar qualquer decorador
+import "reflect-metadata"; 
 import express from 'express';
-import cors from 'cors';  // Importando o middleware CORS
-import { AppDataSource } from './data-source';  // Importando o DataSource
+import cors from 'cors';  
+import { AppDataSource } from './data-source';  
 import router from './http/routes/authRoutes';
 import uploadRoutes from './http/routes/uploadRoutes';
-import path from 'path';   // Supondo que seu arquivo de rotas esteja aqui
+import path from 'path';   
 
 const app = express();
 
 
 app.use(cors());  
 
-// Iniciar a conexão com o banco de dados
 AppDataSource.initialize()
   .then(() => {
     console.log('Conexão com o banco de dados estabelecida');
@@ -20,10 +19,8 @@ AppDataSource.initialize()
     console.error('Erro ao conectar com o banco de dados:', error);
   });
 
-// Middleware para interpretar JSON
 app.use(express.json());
 
-// Usar o roteador principal
 app.use('/autenticacao', router);
   
 app.use('/flutter', router);

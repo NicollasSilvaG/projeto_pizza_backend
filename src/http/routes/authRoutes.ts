@@ -37,7 +37,7 @@ router.post('/login', async (req, res) => {
   }
 });
 
-router.get('/usuariosAdmin', authController.buscarAdmin);
+router.get('/usuariosAdmins', authController.buscarAdmin);
 router.get('/usuariosAdmin/:id', authController.buscarPorIdAdmin);
 router.put('/usuariosAdmin/:id', authController.atualizarAdmin);
 router.delete('/usuariosAdmin/:id', authController.deletarAdmin);
@@ -61,9 +61,9 @@ router.post('/loginuser', async (req, res) => {
 });
 
 router.get('/usuarios', buscarUsuarios);
-router.get('/usuarios/:id', buscarUsuarioPorId);
-router.delete('/usuarios/:id', deletarUsuario);
-router.put('/usuarios/:id', atualizarUsuario);
+router.get('/usuario/:id', buscarUsuarioPorId);
+router.delete('/usuario/:id', deletarUsuario);
+router.put('/usuario/:id', atualizarUsuario);
 
 router.post('/produto', upload.single('imagem'), async (req, res) => {
   try {
@@ -135,9 +135,20 @@ router.get('/pedidos', async (req, res) => {
   }
 });
 
+// Rota para listar um pedido pelo ID
 router.get('/pedido/:idPedido', async (req, res) => {
   try {
-    await PedidoController.buscarTodosPedidos(req, res);
+    await PedidoController.buscarPedidoPorId(req, res);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Erro ao buscar pedido', details: error });
+  }
+});
+
+// Rota para cancelar um pedido pelo ID
+router.patch('/pedidos/:idPedido/cancelar', async (req, res) => {
+  try {
+    await PedidoController.cancelarPedido(req, res);
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Erro ao buscar pedido', details: error });
@@ -168,6 +179,46 @@ router.get('/pedido/:idPedido', async (req, res) => {
     res.status(500).json({ error: 'Erro ao associar produto ao pedido', details: error });
   }
 });*/
+
+// Rota para criar um carrinho
+router.post('/carrinhos', async (req, res) => {
+  try {
+    await carrinhoController.criarCarrinho(req, res);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Erro ao criar o carrinho', details: error });
+  }
+});
+
+// Rota para adicionar um produto ao carrinho
+router.post('/carrinhos/:carrinhoId/produtos', async (req, res) => {
+  try {
+    await carrinhoController.adicionarProdutoAoCarrinho(req, res);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Erro ao adicionar produto ao carrinho', details: error });
+  }
+});
+
+// Rota para consultar o carrinho de um usuário
+router.get('/usuarios/:usuarioId/carrinhos', async (req, res) => {
+  try {
+    await carrinhoController.consultarCarrinho(req, res);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Erro ao consultar o carrinho', details: error });
+  }
+});
+
+// Rota para finalizar o carrinho
+router.post('/carrinhos/:carrinhoId/finalizar', async (req, res) => {
+  try {
+    await carrinhoController.finalizarCarrinho(req, res);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Erro ao finalizar o carrinho', details: error });
+  }
+});
 
 router.get('/carrinho/:idPedido', async (req, res) => {
   try {
@@ -249,6 +300,9 @@ router.delete('/categoria/:idCategoria', CategoriaController.deletarCategoria);
 
 // Rota para criar uma pizzaria
 router.post('/pizzaria', PizzariaController.create);
+
+// Rota para listar uma pizzaria pelo ID
+router.get('/pizzaria/:idPizzaria', PizzariaController.buscarPizzariaPorId);
 
 // Rota para listar todas as pizzarias
 router.get('/pizzarias', PizzariaController.buscarTodasPizzarias);

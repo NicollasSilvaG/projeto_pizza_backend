@@ -1,10 +1,10 @@
 import { Request, Response } from "express";
-import { AppDataSource } from "../data-source";  // Importe o DataSource
-import { Usuario } from "../entities/Usuario";   // Importe a entidade Usuario
+import { AppDataSource } from "../data-source";  
+import { Usuario } from "../entities/Usuario";   
 import bcrypt from "bcrypt"; 
 import jwt from 'jsonwebtoken';
 
-const SECRET_KEY = "seu_secret_key"; // Use uma chave secreta segura para o JWT
+const SECRET_KEY = "seu_secret_key"; 
 
 export const cadastrarUsuario = async (req: Request, res: Response) => {
     const { nome, email, senha, telefone, rua, cidade, uf, cep, bairro, complemento } = req.body;
@@ -14,10 +14,9 @@ export const cadastrarUsuario = async (req: Request, res: Response) => {
         return res.status(400).json({ error: "Nome, email, senha e telefone são obrigatórios." });
     }
 
-    const usuarioRepository = AppDataSource.getRepository(Usuario); // Use o DataSource aqui
+    const usuarioRepository = AppDataSource.getRepository(Usuario); 
 
     try {
-        // Verificar se o usuário já existe
         const usuarioExistente = await usuarioRepository.findOne({ where: { email } });
         if (usuarioExistente) {
             return res.status(400).json({ error: "Este email já está cadastrado." });
@@ -28,11 +27,9 @@ export const cadastrarUsuario = async (req: Request, res: Response) => {
         usuario.nome = nome;
         usuario.email = email;
 
-        // Hash da senha antes de salvar
         const hashedSenha = await bcrypt.hash(senha, 10);
         usuario.senha = hashedSenha;
 
-        // Informações adicionais
         usuario.telefone = telefone;
         usuario.rua = rua;
         usuario.cidade = cidade;
@@ -41,7 +38,6 @@ export const cadastrarUsuario = async (req: Request, res: Response) => {
         usuario.bairro = bairro;
         usuario.complemento = complemento;
 
-        // Salvar no banco de dados
         await usuarioRepository.save(usuario);
 
         return res.status(201).json({ message: "Usuário cadastrado com sucesso" });
